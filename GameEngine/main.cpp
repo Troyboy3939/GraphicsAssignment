@@ -6,6 +6,8 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+#include "FlyCamera.h"
+
 
 void Printm4(glm::mat4 value)
 {
@@ -52,20 +54,27 @@ int main()
 
 	//DO STUFF
 	
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glm::vec3 verticies[] =
 	{
 		//Plane 1
-		glm::vec3(0.1f, 0.1f, -0.1f),  
-		glm::vec3(0.1f, -0.1f, -0.1f), 
-		glm::vec3(-0.1f, -0.1f, -0.1f),
-		glm::vec3(-0.1f, 0.1f, -0.1f), 
+		glm::vec3(0.1f, 0.1f, -0.1f),  //0
+		glm::vec3(0.1f, -0.1f, -0.1f), //1
+		glm::vec3(-0.1f, -0.1f, -0.1f),//2
+		glm::vec3(-0.1f, 0.1f, -0.1f), //3
+									   //
+		//Plane 2					   //
+		glm::vec3(0.1f, 0.1f, 0.1f),   //4
+		glm::vec3(0.1f, -0.1f, 0.1f),  //5
+		glm::vec3(-0.1f, -0.1f, 0.1f), //6
+		glm::vec3(-0.1f, 0.1f, 0.1f),  //7
+									   //
+		glm::vec3(0.0f ,0.0f ,0.0f ),  //8
+		glm::vec3(100.0f ,0.0f ,0.0f),   //9
+		glm::vec3(100.0f ,0.0f ,100.0f), //10
+		glm::vec3(0.0f ,0.0f ,100.0f)    //11
 
-		//Plane 2
-		glm::vec3(0.1f, 0.1f, 0.1f),   
-		glm::vec3(0.1f, -0.1f, 0.1f),	
-		glm::vec3(-0.1f, -0.1f, 0.1f),	
-		glm::vec3(-0.1f, 0.1f, 0.1f),	
 	};
 
 	unsigned int index_buffer[] = {
@@ -80,16 +89,17 @@ int main()
 		0, 3, 7,   // top first triangle        
 		7, 4, 0,   // top second triangle         
 		1, 2, 6,   // bottom first triangle        
-		6, 5, 1    // bottom second triangle    
+		6, 5, 1,    // bottom second triangle
+
+		8, 10, 9,  //floor triangle 1
+		8, 11, 10   //floor triangle 2
 	};
 
-
+	FlyCamera* camera = new FlyCamera(glm::vec3(0,0,1), glm::vec3(0), 16.0f / 9.0f, 3.14159f * 0.25f,  0.01f,  10000000.0f);
 	
-	glm::mat4 projection = glm::perspective(1.507f, 16 / 9.0f, 0.5f, 5.0f);
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 1), glm::vec3(0), glm::vec3(0, 1, 0));
+	//glm::mat4 projection = glm::perspective(1.507f, 16 / 9.0f, 0.5f, 5.0f);
+	//glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 1), glm::vec3(0), glm::vec3(0, 1, 0));
 	glm::mat4 model = glm::mat4(1);
-
-
 	unsigned int VAO;
 	unsigned int VBO;
 	UINT IBO;
@@ -247,22 +257,28 @@ int main()
 		std::cout << std::endl;
 	}
 
-
-
+	float currentFrame = glfwGetTime();
+	float deltaTime = 0; 
+	float lastFrame = 0;
 	//Keeps the window open until the escape key is pressed.
 	while (glfwWindowShouldClose(window) == false && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
 		glEnable(GL_DEPTH_TEST); //Enables depth buffer.
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		model = glm::rotate(model, 0.01f, glm::vec3(1, 1, 0));
+		//model = glm::rotate(model, 0.01f, glm::vec3(1, 1, 0));
+		
 
-		glm::mat4 pv = projection * view ;
+		currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		//glm::mat4 pv = projection * view ;
+		camera->update(deltaTime);
 
 		glm::vec4 color = glm::vec4(0.5f);
 
 		glUseProgram(shaderProgramID);
 		auto uniform_location = glGetUniformLocation(shaderProgramID,"projection_view_matrix");
-		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pv));
+		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(camera->GetProjectionView()));
 		uniform_location = glGetUniformLocation(shaderProgramID, "model_matrix");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(model));
 		uniform_location = glGetUniformLocation(shaderProgramID, "color");
@@ -272,7 +288,7 @@ int main()
 
 		glBindVertexArray(VAO);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT,0);
+		glDrawElements(GL_TRIANGLES,42,GL_UNSIGNED_INT,0);
 
 		glfwSwapBuffers(window);
 
