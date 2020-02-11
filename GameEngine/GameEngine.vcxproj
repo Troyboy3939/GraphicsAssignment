@@ -154,6 +154,8 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FlyCamera.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shaders\colour.shader" />
@@ -162,6 +164,8 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FlyCamera.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
