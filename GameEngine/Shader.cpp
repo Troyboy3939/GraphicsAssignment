@@ -36,7 +36,7 @@ unsigned int Shader::GetShaderProgram()
 	return shaderProgramID;
 }
 
-void Shader::Update(Camera* camera, glm::mat4 model)
+void Shader::Update(FlyCamera* camera, glm::mat4 model)
 {
 	glm::vec4 color = glm::vec4(0.5f);
 

@@ -14,20 +14,7 @@ Mesh::Mesh()
 	glGenBuffers(1, &ibo);
 
 
-	//glClearColor(0, 0, 0, 1);
 
-	////bind
-	//glBindVertexArray(vao);
-	////glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	////glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * verts.size(), verts.data(), GL_STATIC_DRAW);
-	////glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	////glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer), index_buffer.data(), GL_STATIC_DRAW);
-
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), 0);
-
-	//glBindVertexArray(0);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 }
 
@@ -44,7 +31,8 @@ void Mesh::initializeQuad()
 	//assert(vao == 0);
 	
 
-	verts = std::vector<glm::vec3>({
+	verts = std::vector<glm::vec3>(
+		{
 
 		//Cube
 		glm::vec3(0.1f, 0.1f, -0.1f),  //0
@@ -84,7 +72,7 @@ void Mesh::initializeQuad()
 
 		8, 10, 9,  //floor triangle 1 
 		8, 11, 10   //floor triangle 2
-	}	;
+	};
 
 
 	////generate buffers

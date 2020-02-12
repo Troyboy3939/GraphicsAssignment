@@ -9,8 +9,8 @@
 #include "ext.hpp"
 #include <Vector>
 #include <iostream>
+#include "FlyCamera.h"
 
-class Camera;
 
 class Shader
 {
@@ -21,7 +21,7 @@ public:
 	unsigned int GetFragmentShader();
 	unsigned int GetShaderProgram();
 
-	void Update(Camera* camera, glm::mat4 model);
+	void Update(FlyCamera* camera, glm::mat4 model);
 private:
 	void Vertex();
 	void Fragment();
