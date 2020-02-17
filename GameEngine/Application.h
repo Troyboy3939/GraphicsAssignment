@@ -7,7 +7,6 @@
 #include "FlyCamera.h"
 #include "Game.h"
 
-
 class Application
 {
 public:
@@ -19,25 +18,24 @@ public:
 	int GetMajor();
 	int GetMinor();
 
+	FlyCamera* m_pCamera;
+	Shader* m_pShader;
 private:
 	int InitializeWindow();
 
 
 	//Window Stuff
-	GLFWwindow* window;
-	int major;
-	int minor;
-	int returnValue;
+	GLFWwindow* m_pWindow;
+	int m_nMajor;
+	int m_nMinor;
+	int m_nReturnValue;
 
 	//DeltaTime stuff
-	float currentFrame;
-	float deltaTime;
-	float lastFrame;
+	float m_fCurrentFrame;
+	float m_fDeltaTime;
+	float m_fLastFrame;
 
 	//Other stuff
-	Shader* m_pShader;
-	FlyCamera* m_pCamera;
 	Game* m_pGame;
-	glm::mat4 model;
 };
 

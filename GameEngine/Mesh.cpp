@@ -1,17 +1,18 @@
 #include "Mesh.h"
 #include "gl_core_4_5.h"
 #include <vector>
+#include "Shader.h"
 Mesh::Mesh()
 {
-	triCount = 0;
-	vao = 0;
-	vbo = 0;
-	ibo = 0;
+	m_nTriCount = 0;
+	m_nVao = 0;
+	m_nVbo = 0;
+	m_nIbo = 0;
 
 
-	glGenBuffers(1, &vbo);
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &ibo);
+	glGenBuffers(1, &m_nVbo);
+	glGenVertexArrays(1, &m_nVao);
+	glGenBuffers(1, &m_nIbo);
 
 
 
@@ -20,18 +21,18 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
-	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ibo);
+	glDeleteVertexArrays(1, &m_nVao);
+	glDeleteBuffers(1, &m_nVbo);
+	glDeleteBuffers(1, &m_nIbo);
 }
 
-void Mesh::initializeQuad()
+void Mesh::InitializeQuad()
 {
 	//check that the mesh is already initialized
 	//assert(vao == 0);
 	
 
-	verts = std::vector<glm::vec3>(
+	m_av3Verts = std::vector<glm::vec3>(
 		{
 
 		//Cube
@@ -55,7 +56,7 @@ void Mesh::initializeQuad()
 
 		});
 
-	index_buffer =
+	m_anIndex_buffer =
 	{
 		0, 1, 3,   // front first triangle  
 		1, 2, 3,   // front second triangle  
@@ -84,11 +85,11 @@ void Mesh::initializeQuad()
 	//glClearColor(0,0,0,1);
 
 	//bind
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * verts.size(), verts.data(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * index_buffer.size(), index_buffer.data(), GL_STATIC_DRAW);
+	glBindVertexArray(m_nVao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_nVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * m_av3Verts.size(), m_av3Verts.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIbo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_anIndex_buffer.size(), m_anIndex_buffer.data(), GL_STATIC_DRAW);
 
 
 	glEnableVertexAttribArray(0);
@@ -97,19 +98,28 @@ void Mesh::initializeQuad()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	triCount = index_buffer.size() / 3;
+	m_nTriCount = m_anIndex_buffer.size() / 3;
 	
 	
-
-	
-
 
 }
 
-void Mesh::draw()
+void Mesh::Draw(Shader* pShader)
 {
-	glBindVertexArray(vao);
+	auto uniform_location = glGetUniformLocation(pShader->GetShaderProgram(), "model_matrix");
+	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m_m4Model));
 
-	glDrawElements(GL_TRIANGLES, index_buffer.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(m_nVao);
+	glDrawElements(GL_TRIANGLES, m_anIndex_buffer.size(), GL_UNSIGNED_INT,0);
+}
+
+void Mesh::SetPos(glm::vec3 v3Pos)
+{
+	m_m4Model[3] = glm::vec4(v3Pos,1);
+}
+
+glm::vec3 Mesh::GetPos()
+{
+	return m_m4Model[3];
 }
 

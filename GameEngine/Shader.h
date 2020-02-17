@@ -21,31 +21,31 @@ public:
 	unsigned int GetFragmentShader();
 	unsigned int GetShaderProgram();
 
-	void Update(FlyCamera* camera, glm::mat4 model);
+	void Update(FlyCamera* pCamera);
 private:
 	void Vertex();
 	void Fragment();
 	void Link();
 
 
-	GLint success;
+	GLint m_nSuccess;
 
-	std::string shaderData;
+	std::string m_shaderData;
 
 	//Paths to shaders
-	std::stringstream vertexPath;
-	std::stringstream fragmentPath;
+	std::stringstream m_vertexPath;
+	std::stringstream m_fragmentPath;
 
 
-	std::stringstream vertexStringStream;
-	std::stringstream fragStringStream;
+	std::stringstream m_vertexStringStream;
+	std::stringstream m_fragStringStream;
 
 
 	const char* data;
 
 
-	unsigned int VertexShaderID = 0;
-	unsigned int fragmentShaderID = 0;
-	unsigned int shaderProgramID = 0;
+	unsigned int m_nVertexShaderID = 0;
+	unsigned int m_nFragmentShaderID = 0;
+	unsigned int m_nShaderProgramID = 0;
 };
 

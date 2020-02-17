@@ -6,22 +6,22 @@ class FlyCamera :
 	public Camera
 {
 public:
-	FlyCamera(const glm::vec3 position,
-		const glm::vec3 lookAt,
-		const float aspectRatio /* = 16.0 / 9.0f*/,
-		const float FOV_Y /* = 3.14159f * 0.5f */,
-		const float Near/*  = 0.5f*/,
-		const float Far /*= 100.0f */);
+	FlyCamera(const glm::vec3 v3Position,
+		const glm::vec3 v3LookAt,
+		const float fAspectRatio /* = 16.0 / 9.0f*/,
+		const float fFOV_Y /* = 3.14159f * 0.5f */,
+		const float fNear/*  = 0.5f*/,
+		const float fFar /*= 100.0f */);
 
 
 
-	void update(float deltaTime);
-	void SetSpeed(float speed);
+	void Update(float fDeltaTime);
+	void SetSpeed(float fSpeed);
 
 private:
-	float speed;
-	float angularSpeed;
-	glm::vec3 up;
+	float m_fSpeed;
+	float m_fAngularSpeed;
+	glm::vec3 m_fUp;
 
 
 };

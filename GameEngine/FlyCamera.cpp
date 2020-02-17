@@ -1,16 +1,16 @@
 #include "FlyCamera.h"
 
 
-FlyCamera::FlyCamera(const glm::vec3 position, const glm::vec3 lookAt, const float aspectRatio, const float FOV_Y, const float near, const float far) : Camera::Camera()
+FlyCamera::FlyCamera(const glm::vec3 v3Position, const glm::vec3 v3LookAt, const float fAspectRatio, const float fFOV_Y, const float fNear, const float fFar) : Camera::Camera()
 {
-	up = glm::vec3(0,1,0);
-	speed = 1;
-	angularSpeed = 0.5f;
-	setPerspective(FOV_Y, aspectRatio, near, far);
-	setLookAt(position, lookAt,up);
+	m_fUp = glm::vec3(0,1,0);
+	m_fSpeed = 1;
+	m_fAngularSpeed = 0.5f;
+	SetPerspective(fFOV_Y, fAspectRatio, fNear, fFar);
+	SetLookAt(v3Position, v3LookAt,m_fUp);
 }
 
-void FlyCamera::update(float deltaTime)
+void FlyCamera::Update(float deltaTime)
 {
 	auto glfwWindow = glfwGetCurrentContext();
 	bool inputFlag = false;
@@ -64,7 +64,7 @@ void FlyCamera::update(float deltaTime)
 
 	if (inputFlag)
 	{
-		setPosition(GetWorld(3) + (glm::vec4(displacement,0.0f) * speed * deltaTime));
+		SetPosition(GetWorld(3) + (glm::vec4(displacement,0.0f) * m_fSpeed * deltaTime));
 
 	}
 
@@ -90,21 +90,22 @@ void FlyCamera::update(float deltaTime)
 		// Identity matrix to accumulate rotation
 		auto rotation = glm::mat4(1.0f);
 		// Left / Right rotation
-		rotation = glm::rotate(rotation, float(angularSpeed * deltaTime * -delta_x), glm::vec3(GetView(1)));
+		rotation = glm::rotate(rotation, float(m_fAngularSpeed * deltaTime * -delta_x), glm::vec3(GetView(1)));
 		// Up / Down rotation
-		rotation = glm::rotate(rotation, float(angularSpeed * deltaTime * -delta_y), glm::vec3(1.0f, 0.0f, 0.0f));
+		rotation = glm::rotate(rotation, float(m_fAngularSpeed * deltaTime * -delta_y), glm::vec3(1.0f, 0.0f, 0.0f));
 
 		// Apply the rotation to the camera
-		worldTransform = worldTransform * rotation;
+		m4WorldTransform = m4WorldTransform * rotation;
 		// Preserve the inverse
-		viewTransform = glm::inverse(worldTransform);
+		m4ViewTransform = glm::inverse(m4WorldTransform);
 		// Update PxV
 	}
 
-	updateProjectionView();
+	UpdateProjectionView();
 }
 
-void FlyCamera::SetSpeed(float speed)
+void FlyCamera::SetSpeed(float fSpeed)
 {
+	m_fSpeed = fSpeed;
 }
 

@@ -3,15 +3,15 @@
 
 Shader::Shader(std::string vertex, std::string fragment)
 {
-	success = GL_FALSE;
+	m_nSuccess = GL_FALSE;
 
 	//Path to where shaders should be found
 	std::string path = "..\\Shaders\\";
 
 	
 	//add filename to the path
-	vertexPath << path << vertex;
-	fragmentPath << path << fragment;
+	m_vertexPath << path << vertex;
+	m_fragmentPath << path << fragment;
 	
 
 
@@ -23,47 +23,44 @@ Shader::Shader(std::string vertex, std::string fragment)
 
 unsigned int Shader::GetVertexShader()
 {
-	return VertexShaderID;
+	return m_nVertexShaderID;
 }
 
 unsigned int Shader::GetFragmentShader()
 {
-	return fragmentShaderID;
+	return m_nFragmentShaderID;
 }
 
 unsigned int Shader::GetShaderProgram()
 {
-	return shaderProgramID;
+	return m_nShaderProgramID;
 }
 
-void Shader::Update(FlyCamera* camera, glm::mat4 model)
+void Shader::Update(FlyCamera* pCamera)
 {
 	glm::vec4 color = glm::vec4(0.5f);
 
-	glUseProgram(shaderProgramID);
-	auto uniform_location = glGetUniformLocation(shaderProgramID, "projection_view_matrix");
-	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(camera->GetProjectionView()));
-	uniform_location = glGetUniformLocation(shaderProgramID, "model_matrix");
-	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(model));
-	uniform_location = glGetUniformLocation(shaderProgramID, "color");
+	glUseProgram(m_nShaderProgramID);
+	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "projection_view_matrix");
+	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pCamera->GetProjectionView()));
+	/*uniform_location = glGetUniformLocation(m_nShaderProgramID, "model_matrix");
+	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m4Model));*/
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "color");
 	glUniform4fv(uniform_location, 1, glm::value_ptr(color));
 
-
-
-	
 }
 
 void Shader::Vertex()
 {
 
-	std::ifstream inFileStream(vertexPath.str(),std::ifstream::in);
+	std::ifstream inFileStream(m_vertexPath.str(),std::ifstream::in);
 
 	//std::ofstream testOutput()
 
 	if (inFileStream.is_open())
 	{
-		vertexStringStream << inFileStream.rdbuf();
-		shaderData = vertexStringStream.str();
+		m_vertexStringStream << inFileStream.rdbuf();
+		m_shaderData = m_vertexStringStream.str();
 		inFileStream.close();
 	}
 	else
@@ -72,26 +69,26 @@ void Shader::Vertex()
 	}
 
 
-	VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-	data = shaderData.c_str();
+	m_nVertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	data = m_shaderData.c_str();
 
-	glShaderSource(VertexShaderID, 1, (const GLchar**)&data, 0);
-	glCompileShader(VertexShaderID);
+	glShaderSource(m_nVertexShaderID, 1, (const GLchar**)&data, 0);
+	glCompileShader(m_nVertexShaderID);
 
-	success = GL_FALSE;
-	glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &success);
+	m_nSuccess = GL_FALSE;
+	glGetShaderiv(m_nVertexShaderID, GL_COMPILE_STATUS, &m_nSuccess);
 
-	if (success == GL_FALSE)
+	if (m_nSuccess == GL_FALSE)
 	{
 		printf("Vertex Shader Failed");
 
 		GLint maxlength = 0;
 
-		glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &maxlength);
+		glGetShaderiv(m_nVertexShaderID, GL_INFO_LOG_LENGTH, &maxlength);
 
 		std::vector<GLchar> errorlog(maxlength);
 
-		glGetShaderInfoLog(VertexShaderID, maxlength, NULL, &errorlog[0]);
+		glGetShaderInfoLog(m_nVertexShaderID, maxlength, NULL, &errorlog[0]);
 
 		for (int i = 0; i < maxlength; i++)
 		{
@@ -105,13 +102,13 @@ void Shader::Vertex()
 void Shader::Fragment()
 {
 
-	std::ifstream inFileStream(fragmentPath.str(), std::ifstream::in);
+	std::ifstream inFileStream(m_fragmentPath.str(), std::ifstream::in);
 
 
 	if (inFileStream.is_open())
 	{
-		fragStringStream << inFileStream.rdbuf();
-		shaderData = fragStringStream.str();
+		m_fragStringStream << inFileStream.rdbuf();
+		m_shaderData = m_fragStringStream.str();
 		inFileStream.close();
 	}
 	else
@@ -120,27 +117,27 @@ void Shader::Fragment()
 	}
 
 
-	fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-	 data = shaderData.c_str();
+	m_nFragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+	 data = m_shaderData.c_str();
 
-	glShaderSource(fragmentShaderID, 1, (const GLchar**)&data, 0);
-	glCompileShader(fragmentShaderID);
+	glShaderSource(m_nFragmentShaderID, 1, (const GLchar**)&data, 0);
+	glCompileShader(m_nFragmentShaderID);
 
-	success = GL_FALSE;
+	m_nSuccess = GL_FALSE;
 
-	glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &success);
+	glGetShaderiv(m_nFragmentShaderID, GL_COMPILE_STATUS, &m_nSuccess);
 
-	if (success == GL_FALSE)
+	if (m_nSuccess == GL_FALSE)
 	{
 		printf("Vertex Shader Failed");
 
 		GLint maxlength = 0;
 
-		glGetShaderiv(fragmentShaderID, GL_INFO_LOG_LENGTH, &maxlength);
+		glGetShaderiv(m_nFragmentShaderID, GL_INFO_LOG_LENGTH, &maxlength);
 
 		std::vector<GLchar> errorlog(maxlength);
 
-		glGetShaderInfoLog(fragmentShaderID, maxlength, NULL, &errorlog[0]);
+		glGetShaderInfoLog(m_nFragmentShaderID, maxlength, NULL, &errorlog[0]);
 
 		for (int i = 0; i < maxlength; i++)
 		{
@@ -152,30 +149,30 @@ void Shader::Fragment()
 
 void Shader::Link()
 {
-	shaderProgramID = glCreateProgram();
+	m_nShaderProgramID = glCreateProgram();
 
-	glAttachShader(shaderProgramID, VertexShaderID);
-	glAttachShader(shaderProgramID, fragmentShaderID);
+	glAttachShader(m_nShaderProgramID, m_nVertexShaderID);
+	glAttachShader(m_nShaderProgramID, m_nFragmentShaderID);
 
-	glLinkProgram(shaderProgramID);
+	glLinkProgram(m_nShaderProgramID);
 
 
-	success = GL_FALSE;
+	m_nSuccess = GL_FALSE;
 
-	glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &success);
+	glGetProgramiv(m_nShaderProgramID, GL_LINK_STATUS, &m_nSuccess);
 
-	if (success == GL_FALSE)
+	if (m_nSuccess == GL_FALSE)
 	{
 		printf("Suprise! Your shader is fucked lol");
 		std::cout << std::endl;
 
 		GLint maxlength = 0;
 
-		glGetProgramiv(shaderProgramID, GL_INFO_LOG_LENGTH, &maxlength);
+		glGetProgramiv(m_nShaderProgramID, GL_INFO_LOG_LENGTH, &maxlength);
 
 		std::vector<GLchar> errorlog(maxlength);
 
-		glGetProgramInfoLog(shaderProgramID, maxlength, NULL, &errorlog[0]);
+		glGetProgramInfoLog(m_nShaderProgramID, maxlength, NULL, &errorlog[0]);
 
 		for (int i = 0; i < maxlength; i++)
 		{
