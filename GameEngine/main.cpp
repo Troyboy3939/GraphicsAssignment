@@ -14,16 +14,9 @@ int main()
 			glEnable(GL_DEPTH_TEST); //Enables depth buffer.
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			
-
-
-			//uniform_location = glGetUniformLocation(m_nShaderProgramID, "color");
-			//glUniform4fv(uniform_location, 1, glm::value_ptr(color));
-
 			m_pApplication->Update();
 			m_pApplication->Draw();
 		}
-	
 		delete m_pApplication;
 		m_pApplication = nullptr;
 

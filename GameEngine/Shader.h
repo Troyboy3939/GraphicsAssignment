@@ -20,6 +20,8 @@ public:
 	unsigned int GetVertexShader();
 	unsigned int GetFragmentShader();
 	unsigned int GetShaderProgram();
+	void Draw(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize);
+
 
 	void Update(FlyCamera* pCamera);
 private:

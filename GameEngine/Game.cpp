@@ -7,10 +7,10 @@
 Game::Game()
 {
 	m_pMesh = new Mesh();
-	m_pMesh->InitializeQuad();
 	
+	m_pMesh->InitializeQuad();
 
-
+	//m_pMesh->Rotate(90,glm::vec3(0,0,1));
 	
 
 }
@@ -23,10 +23,12 @@ Game::~Game()
 
 }
 
-void Game::Update(float deltaTime)
+void Game::Update(float fDeltaTime)
 {
-	m_pMesh->SetPos(m_pMesh->GetPos() + (glm::vec3(1,0,0) * deltaTime));
+	
+	m_pMesh->Rotate(0.1  * fDeltaTime, glm::vec3(0, 1, 0));
 }
+
 
 void Game::Draw(Shader* pShader)
 {

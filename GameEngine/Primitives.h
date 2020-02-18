@@ -17,8 +17,8 @@ public:
 	
 	Shape GenerateCube();
 	Shape GenerateGrid(int nVerticies);
-	Shape GeneratePlane(float fX, float fZ);
-	Shape GenerateSphere(float fRadius);
+	Shape GeneratePlane();
+	Shape GenerateSphere(float fRadius, int nSectors, int nStacks);
 
 	static void Create();
 	static void Destroy();
@@ -27,8 +27,9 @@ public:
 
 private:
 	Primitives();
+	~Primitives();
+	void ClearPrim();
 
-
-	Shape m_Prim;
+	Shape* m_Prim;
 	static Primitives* m_pInstance;
 };

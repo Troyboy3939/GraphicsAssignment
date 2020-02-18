@@ -36,6 +36,15 @@ unsigned int Shader::GetShaderProgram()
 	return m_nShaderProgramID;
 }
 
+void Shader::Draw(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
+{
+	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "model_matrix");
+	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m4Model));
+
+	glBindVertexArray(nVAO);
+	glDrawElements(GL_TRIANGLES,nIndexSize , GL_UNSIGNED_INT, 0);
+}
+
 void Shader::Update(FlyCamera* pCamera)
 {
 	glm::vec4 color = glm::vec4(0.5f);

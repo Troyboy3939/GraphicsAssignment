@@ -1,6 +1,6 @@
 #include "Application.h"
 #include <iostream>
-
+#include "Primitives.h"
 
 
 Application::Application()
@@ -43,12 +43,15 @@ Application::Application()
 		m_fDeltaTime = 0;
 		m_fLastFrame = 0;
 
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		//Other stuff initialised
+
+		//Primitives must come before game!!!
+		Primitives::Create();
 		m_pGame = new Game();
 		m_pCamera = new FlyCamera(glm::vec3(0, 0, 1), glm::vec3(0), 16.0f / 9.0f, 3.14159f * 0.25f, 0.01f, 10000000.0f);
 		m_pShader = new Shader("vert.shader", "colour.shader");
-		
 
 	}
 
@@ -70,6 +73,8 @@ Application::~Application()
 
 	delete m_pCamera;
 	m_pCamera = nullptr;
+
+	Primitives::Destroy();
 }
 
 void Application::Update()
