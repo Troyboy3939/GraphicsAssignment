@@ -1,7 +1,5 @@
 #pragma once
-
 class Mesh;
-class OBJMesh;
 class Shader;
 
 class Game
@@ -13,6 +11,6 @@ public:
 	void Draw(Shader* pShader);
 private:
 	Mesh* m_pMesh;
-
+	Mesh* m_pDragon;
 };
 

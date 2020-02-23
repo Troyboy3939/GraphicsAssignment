@@ -90,7 +90,7 @@ Primitives::Shape Primitives::GeneratePlane()
 
 
 
-	return Shape();
+	return *m_Prim;
 }
 
 Primitives::Shape  Primitives::GenerateSphere(float fRadius, int nSectors, int nStacks)
