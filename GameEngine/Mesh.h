@@ -4,6 +4,7 @@
 #include <Vector>
 #include <String>
 
+
 class Shader;
 
 class Mesh
@@ -25,7 +26,7 @@ public:
 
 	
 
-	//Classes for OBJ
+
 	struct Vertex
 	{
 		glm::vec4 m_v4Position;
@@ -68,7 +69,7 @@ public:
 protected:
 	//Functions for OBJ loading
 	bool LoadModel(const char* szFileName, bool bLoadTextures = true, bool bFlipTextureV = false);
-	void DrawModel(Shader* pShaderbool ,bool bUsePatches = false);
+	void DrawModel(Shader* pShader, bool bUsePatches = false);
 	std::string& GetFileName();
 	void CalculateTangents(std::vector<Vertex>& av3Verts, std::vector<unsigned int>& anIndicies);
 
@@ -84,7 +85,7 @@ protected:
 
 
 	std::string m_sFileName;
-	std::vector<MeshChunk*> m_aMeshChunks;
+	std::vector<MeshChunk> m_aMeshChunks;
 	std::vector<Material> m_aMaterials;
 
 
@@ -99,6 +100,11 @@ protected:
 
 	std::vector<unsigned int> m_anIndex_buffer;
 	std::vector<glm::vec3> m_av3Verts;
+
+
+	unsigned int m_nTexture;
+	int m_nX, m_nY, m_nN;
+
 	unsigned int m_nTriCount;
 	unsigned int m_nVao;
 	unsigned int m_nVbo;

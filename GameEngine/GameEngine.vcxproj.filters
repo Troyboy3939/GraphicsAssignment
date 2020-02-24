@@ -53,6 +53,12 @@
     <None Include="..\Shaders\vert.shader">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\Shaders\TextureFrag.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\TextureVert.Shader">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -77,6 +83,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="tiny_obj_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

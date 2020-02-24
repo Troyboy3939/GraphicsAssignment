@@ -10,7 +10,7 @@ public:
 	void Update(float deltaTime);
 	void Draw(Shader* pShader);
 private:
-	Mesh* m_pMesh;
-	Mesh* m_pDragon;
+
+	Mesh* m_pCube;
 };
 

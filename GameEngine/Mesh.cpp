@@ -9,6 +9,9 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 Mesh::Mesh(Type eType)
 {
 	m_nTriCount = 0;
@@ -36,9 +39,9 @@ Mesh::~Mesh()
 	{
 		for (auto& c : m_aMeshChunks) 
 		{
-			glDeleteVertexArrays(1, &c->m_nVao);
-			glDeleteBuffers(1, &c->m_nVbo);
-			glDeleteBuffers(1, &c->m_nIbo);
+			glDeleteVertexArrays(1, &c.m_nVao);
+			glDeleteBuffers(1, &c.m_nVbo);
+			glDeleteBuffers(1, &c.m_nIbo);
 		}
 
 	}
@@ -47,6 +50,7 @@ Mesh::~Mesh()
 		glDeleteVertexArrays(1, &m_nVao);
 		glDeleteBuffers(1, &m_nVbo);
 		glDeleteBuffers(1, &m_nIbo);
+		glDeleteTextures(1,&m_nTexture);
 	}
 
 
@@ -101,6 +105,15 @@ void Mesh::InitializeQuad(Type eType)
 	m_av3Verts = shape.m_av3Verts;
 	m_anIndex_buffer = shape.m_anIndicies;
 
+
+	unsigned char* data = stbi_load("../Textures/Grass.jpg",&m_nX,&m_nY, &m_nN,0);
+
+	glGenTextures(1, &m_nTexture);
+	glBindTexture(GL_TEXTURE_2D,m_nTexture);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGB, m_nX,m_nY,0,GL_RGB,GL_UNSIGNED_BYTE,data);
+
+	stbi_image_free(data);
+
 	//bind
 	glBindVertexArray(m_nVao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_nVbo);
@@ -117,7 +130,8 @@ void Mesh::InitializeQuad(Type eType)
 
 	m_nTriCount = shape.m_anIndicies.size() / 3;
 	
-	
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 }
 
@@ -162,6 +176,7 @@ void Mesh::Draw(Shader* pShader)
 	else
 	{
 		pShader->Draw(m_m4Model,m_nVao,m_anIndex_buffer.size());
+		glBindTexture(GL_TEXTURE_2D,m_nTexture);
 	}
 }
 
@@ -222,7 +237,8 @@ bool Mesh::LoadModel(const char* szFileName, bool bLoadTextures, bool bFlipTextu
 {
 	
 
-	if (m_aMeshChunks.empty() == false) {
+	if (m_aMeshChunks.empty() == false)
+	{
 		printf("Mesh already initialised, can't re-initialise!\n");
 		return false;
 	}
@@ -343,10 +359,12 @@ bool Mesh::LoadModel(const char* szFileName, bool bLoadTextures, bool bFlipTextu
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+
+
 		// set chunk material
 		chunk.m_nMaterialID = s.mesh.material_ids.empty() ? -1 : s.mesh.material_ids[0];
 
-		m_aMeshChunks.push_back(&chunk);
+		m_aMeshChunks.push_back(chunk);
 	}
 
 	// load obj
@@ -466,12 +484,16 @@ void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
 		//}
 
 		// bind and draw geometry
-		glBindVertexArray(c->m_nVao);
+		glBindVertexArray(c.m_nVao);
+
+		auto uniform_location = glGetUniformLocation(pShader->GetShaderProgram(), "model_matrix");
+		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m_m4Model));
+
 		if (bUsePatches)
-			glDrawElements(GL_PATCHES, c->m_nIndexCount, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_PATCHES, c.m_nIndexCount, GL_UNSIGNED_INT, 0);
 		else
 		{
-			glDrawElements(GL_TRIANGLES, c->m_nIndexCount, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, c.m_nIndexCount, GL_UNSIGNED_INT, 0);
 
 		}
 	}
