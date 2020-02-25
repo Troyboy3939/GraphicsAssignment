@@ -3,7 +3,7 @@
 #include "ext.hpp"
 #include <Vector>
 #include <String>
-
+#include "Primitives.h"
 
 class Shader;
 
@@ -99,7 +99,7 @@ protected:
 
 
 	std::vector<unsigned int> m_anIndex_buffer;
-	std::vector<glm::vec3> m_av3Verts;
+	std::vector<Primitives::Vertex> m_aVerts;
 
 
 	unsigned int m_nTexture;

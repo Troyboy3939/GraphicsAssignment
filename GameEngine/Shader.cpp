@@ -38,7 +38,7 @@ unsigned int Shader::GetShaderProgram()
 
 void Shader::Draw(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 {
-	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "model_matrix");
+	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "m4ModelMatrix");
 	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m4Model));
 
 	glBindVertexArray(nVAO);
@@ -50,7 +50,7 @@ void Shader::Update(FlyCamera* pCamera)
 	glm::vec4 color = glm::vec4(0.5f);
 
 	glUseProgram(m_nShaderProgramID);
-	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "projection_view_matrix");
+	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "m4PVM");
 	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pCamera->GetProjectionView()));
 	/*uniform_location = glGetUniformLocation(m_nShaderProgramID, "model_matrix");
 	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m4Model));*/

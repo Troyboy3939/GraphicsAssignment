@@ -102,36 +102,50 @@ void Mesh::InitializeQuad(Type eType)
 		break;
 	};
 
-	m_av3Verts = shape.m_av3Verts;
+	m_aVerts = shape.m_av3Verts;
 	m_anIndex_buffer = shape.m_anIndicies;
 
 
-	unsigned char* data = stbi_load("../Textures/Grass.jpg",&m_nX,&m_nY, &m_nN,0);
+	unsigned char* data = stbi_load("../Textures/dirt.jpg",&m_nX,&m_nY, &m_nN,0);
 
-	glGenTextures(1, &m_nTexture);
-	glBindTexture(GL_TEXTURE_2D,m_nTexture);
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGB, m_nX,m_nY,0,GL_RGB,GL_UNSIGNED_BYTE,data);
-
-	stbi_image_free(data);
+	
 
 	//bind
 	glBindVertexArray(m_nVao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_nVbo);
- 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * m_av3Verts.size(), m_av3Verts.data(), GL_STATIC_DRAW);
+ 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * m_aVerts.size(), m_aVerts.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIbo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_anIndex_buffer.size(), m_anIndex_buffer.data(), GL_STATIC_DRAW);
 
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4)));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+
+	
+
 	m_nTriCount = shape.m_anIndicies.size() / 3;
 	
+
+
+	glGenTextures(1, &m_nTexture);
+	glBindTexture(GL_TEXTURE_2D, m_nTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nX, m_nY, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	stbi_image_free(data);
 
 }
 
@@ -140,7 +154,7 @@ void Mesh::InitializeQuad(float fSphereRadius, int nSectors, int nStacks)
 
 
 	Primitives::Shape shape = Primitives::GetInstance()->GenerateSphere(fSphereRadius, nSectors,nStacks);
-	m_av3Verts = shape.m_av3Verts;
+	m_aVerts = shape.m_av3Verts;
 	m_anIndex_buffer = shape.m_anIndicies;
 
 
@@ -150,7 +164,7 @@ void Mesh::InitializeQuad(float fSphereRadius, int nSectors, int nStacks)
 	//bind
 	glBindVertexArray(m_nVao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_nVbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * m_av3Verts.size(), m_av3Verts.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * m_aVerts.size(), m_aVerts.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIbo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_anIndex_buffer.size(), m_anIndex_buffer.data(), GL_STATIC_DRAW);
 
@@ -177,6 +191,11 @@ void Mesh::Draw(Shader* pShader)
 	{
 		pShader->Draw(m_m4Model,m_nVao,m_anIndex_buffer.size());
 		glBindTexture(GL_TEXTURE_2D,m_nTexture);
+
+		auto uniform_location = glGetUniformLocation(pShader->GetShaderProgram(), "m3NormalMatrix");
+		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(glm::inverseTranspose(glm::mat3(m_m4Model))));
+
+
 	}
 }
 

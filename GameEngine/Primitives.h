@@ -7,14 +7,6 @@ class Primitives
 {
 public:
 
-	struct Shape
-	{
-		std::vector<glm::vec3> m_av3Verts;
-		std::vector<unsigned int> m_anIndicies;
-		std::vector<glm::vec2> m_av2TexCoord;
-	};
-
-
 	struct Vertex
 	{
 		glm::vec4 m_v4Position;
@@ -22,6 +14,14 @@ public:
 		glm::vec2 m_v2TexCoord;
 		glm::vec4 m_v4Tangent;
 	};
+
+	struct Shape
+	{
+		std::vector<Primitives::Vertex> m_av3Verts;
+		std::vector<unsigned int> m_anIndicies;
+		
+	};
+
 
 
 	
@@ -41,6 +41,5 @@ private:
 	void ClearPrim();
 
 	Shape* m_Prim;
-	std::vector<Vertex> m_Shape;
 	static Primitives* m_pInstance;
 };

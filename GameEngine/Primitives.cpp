@@ -66,52 +66,45 @@ Primitives::Shape Primitives::GenerateCube()
 
 	//};
 
-	m_Shape =
-	{
-		Vertex{glm::vec4(0,0,0,1) ,glm::vec4(0,0,0,1) ,glm::vec2(0,0),glm::vec4(0,0,0,1) },
-	};
-
 	m_Prim->m_av3Verts =
 	{
+		//Front Face
+		Vertex{glm::vec4(-0.5f,-0.5f,-0.5f,1) ,glm::vec4(0,0,-1,1) ,glm::vec2(0,1),glm::vec4(0,0,0,1) }, //BL
+		Vertex{glm::vec4(-0.5f,0.5f,-0.5f,1) ,glm::vec4(0,0,-1,1) ,glm::vec2(0,0),glm::vec4(0,0,0,1) }, //TL
+		Vertex{glm::vec4(0.5f,0.5f,-0.5f,1) ,glm::vec4(0,0,-1,1) ,glm::vec2(1,0),glm::vec4(0,0,0,1) }, //TR
+		Vertex{glm::vec4(0.5f,-0.5f,-0.5f,1) ,glm::vec4(0,0,-1,1) ,glm::vec2(1,1),glm::vec4(0,0,0,1) }, //BR
 
-		//Front face
-		glm::vec3(0,0,0),
-		glm::vec3(0,1,0),
-		glm::vec3(1,1,0),
-		glm::vec3(1,0,0),   //4
+		//Back Face
+		Vertex{glm::vec4(-0.5f,-0.5f,0.5f,1) ,glm::vec4(0,0,1,1) ,glm::vec2(0,1),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(-0.5f,0.5f,0.5f,1) ,glm::vec4(0,0,1,1) ,glm::vec2(0,0),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(0.5f,0.5f,0.5f,1) ,glm::vec4(0,0,1,1) ,glm::vec2(1,0),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(0.5f,-0.5f,0.5f,1) ,glm::vec4(0,0,1,1) ,glm::vec2(1,1),glm::vec4(0,0,0,1) },
 
-		//Back face
-		glm::vec3(0,0,1),
-		glm::vec3(0,1,1),
-		glm::vec3(1,1,1),
-		glm::vec3(1,0,1),	//8
+		//Left Face
+		Vertex{glm::vec4(-0.5f,-0.5f,-0.5f,1) ,glm::vec4(-1,0,0,1) ,glm::vec2(0,1),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(-0.5f,0.5f,-0.5f,1) ,glm::vec4(-1,0,0,1) ,glm::vec2(0,0),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(-0.5f,0.5f,0.5f,1) ,glm::vec4(-1,0,0,1) ,glm::vec2(1,0),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(-0.5f,-0.5f,0.5f,1) ,glm::vec4(-1,0,0,1) ,glm::vec2(1,1),glm::vec4(0,0,0,1) },
 
-		//Left
-		glm::vec3(0,0,1),
-		glm::vec3(0,1,1),
-		glm::vec3(0,1,0),
-		glm::vec3(0,0,0),	//12
+		//Right Face
+		Vertex{glm::vec4(0.5f,-0.5f,-0.5f,1) ,glm::vec4(1,0,0,1) ,glm::vec2(0,1),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(0.5f,0.5f,-0.5f,1) ,glm::vec4(1,0,0,1) ,glm::vec2(0,0),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(0.5f,0.5f,0.5f,1) ,glm::vec4(1,0,0,1) ,glm::vec2(1,0),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(0.5f,-0.5f,0.5f,1) ,glm::vec4(1,0,0,1) ,glm::vec2(1,1),glm::vec4(0,0,0,1) },
 
+		//Top Face
+		Vertex{glm::vec4(-0.5f,0.5f,-0.5f,1) ,glm::vec4(0,1,0,1) ,glm::vec2(0,1),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(-0.5f,0.5f,0.5f,1) ,glm::vec4(0,1,0,1) ,glm::vec2(0,0),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(0.5f,0.5f,0.5f,1) ,glm::vec4(0,1,0,1) ,glm::vec2(1,0),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(0.5f,0.5f,-0.5f,1) ,glm::vec4(0,1,0,1) ,glm::vec2(1,1),glm::vec4(0,0,0,1) },
 
-		//Right
-		glm::vec3(1,0,0),
-		glm::vec3(1,1,0),
-		glm::vec3(1,1,1),
-		glm::vec3(1,0,1),	//16
-
-		//Top
-		glm::vec3(0,1,0),
-		glm::vec3(0,1,1),
-		glm::vec3(1,1,1),
-		glm::vec3(1,1,0), //20
-
-		//Bottom
-		glm::vec3(0,0,0),
-		glm::vec3(0,0,1),
-		glm::vec3(1,0,1),
-		glm::vec3(1,0,0)
+		Vertex{glm::vec4(-0.5f,-0.5f,-0.5f,1) ,glm::vec4(0,-1,0,1) ,glm::vec2(0,1),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(-0.5f,-0.5f,0.5f,1) ,glm::vec4(0,-1,0,1) ,glm::vec2(0,0),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(0.5f,-0.5f,0.5f,1) ,glm::vec4(0,-1,0,1) ,glm::vec2(1,0),glm::vec4(0,0,0,1) },
+		Vertex{glm::vec4(0.5f,-0.5f,-0.5f,1) ,glm::vec4(0,-1,0,1) ,glm::vec2(1,1),glm::vec4(0,0,0,1) }
 
 	};
+
 
 	m_Prim->m_anIndicies =
 	{
@@ -143,41 +136,6 @@ Primitives::Shape Primitives::GenerateCube()
 	};
 
 
-	m_Prim->m_av2TexCoord =
-	{
-		glm::vec2(0,0),
-		glm::vec2(0,1),
-		glm::vec2(1,0),
-		glm::vec2(1,1),
-
-		glm::vec2(0,0),
-		glm::vec2(0,1),
-		glm::vec2(1,0),
-		glm::vec2(1,1),
-
-		glm::vec2(0,0),
-		glm::vec2(0,1),
-		glm::vec2(1,0),
-		glm::vec2(1,1),
-
-		glm::vec2(0,0),
-		glm::vec2(0,1),
-		glm::vec2(1,0),
-		glm::vec2(1,1),
-
-		glm::vec2(0,0),
-		glm::vec2(0,1),
-		glm::vec2(1,0),
-		glm::vec2(1,1),
-
-		glm::vec2(0,0),
-		glm::vec2(0,1),
-		glm::vec2(1,0),
-		glm::vec2(1,1),
-
-
-	};
-
 	return *m_Prim;
 }
 
@@ -195,28 +153,14 @@ Primitives::Shape Primitives::GenerateGrid(int nVerticies)
 Primitives::Shape Primitives::GeneratePlane()
 {
 	ClearPrim();
-
 	m_Prim->m_av3Verts =
 	{
-		glm::vec3(0.0f, 0.0f, 0.0f),  //8
-		glm::vec3(1.0f, 0.0f, 0.0f),   //9
-		glm::vec3(1.0f, 0.0f, 1.0f), //10
-		glm::vec3(0.0f, 0.0f, 1.0f)    //11
+		Vertex{ glm::vec4(0.0f, 0.0f, 0.0f,1) ,glm::vec4(0,0,0,1) ,glm::vec2(0,0),glm::vec4(0,0,0,1) },
+		Vertex{ glm::vec4(1.0f, 0.0f, 0.0f,1) ,glm::vec4(0,0,0,1) ,glm::vec2(0,1),glm::vec4(0,0,0,1) },
+		Vertex{ glm::vec4(1.0f, 0.0f, 1.0f,1) ,glm::vec4(0,0,0,1) ,glm::vec2(1,0),glm::vec4(0,0,0,1) },
+		Vertex{ glm::vec4(0.0f, 0.0f, 1.0f,1) ,glm::vec4(0,0,0,1) ,glm::vec2(1,1),glm::vec4(0,0,0,1) }
 	};
 
-	m_Prim->m_anIndicies =
-	{
-		0, 2, 1,  //floor triangle 1 
-		0, 3, 2   //floor triangle 2
-	};
-
-	m_Prim->m_av2TexCoord =
-	{
-		glm::vec2(0,0),
-		glm::vec2(0,1),
-		glm::vec2(1,0),
-		glm::vec2(1,1)
-	};
 
 	return *m_Prim;
 }
@@ -251,21 +195,21 @@ Primitives::Shape  Primitives::GenerateSphere(float fRadius, int nSectors, int n
 			//Vertex Position (x,y,z)
 			fX = fXy * cosf(fSectorAngle);
 			fY = fXy * sinf(fSectorAngle);
-			m_Prim->m_av3Verts.push_back(glm::vec3(fX,fY,fZ));
-
+			
 			//Normalised Vertex normal (nx,ny,nz)
 
-			//fNx = fX * fLengthInv;
-			//fNy = fY * fLengthInv;
-			//fNz = fZ * fLengthInv;
+			fNx = fX * fLengthInv;
+			fNy = fY * fLengthInv;
+			fNz = fZ * fLengthInv;
 			//Add normals to array here
 
 
 
 			//Vertex tex coord
-			//fS = (float)j / nSectors;
-			//fT = (float)i / nStacks;
+			fS = (float)j / nSectors;
+			fT = (float)i / nStacks;
 			//Add st to array
+			m_Prim->m_av3Verts.push_back(Vertex{ glm::vec4(fX, fY, fZ,1) ,glm::vec4(fNx,fNy,fNz,1) ,glm::vec2(fS,fT),glm::vec4(0,0,0,1) });
 		}
 	}
 
