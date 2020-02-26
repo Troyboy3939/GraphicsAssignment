@@ -106,7 +106,7 @@ void Mesh::InitializeQuad(Type eType)
 	m_anIndex_buffer = shape.m_anIndicies;
 
 
-	unsigned char* data = stbi_load("../Textures/dirt.jpg",&m_nX,&m_nY, &m_nN,0);
+	unsigned char* data = stbi_load("../Textures/Grass.jpg",&m_nX,&m_nY, &m_nN,0);
 
 	
 
