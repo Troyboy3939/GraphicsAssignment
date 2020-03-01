@@ -38,8 +38,19 @@ unsigned int Shader::GetShaderProgram()
 
 void Shader::Draw(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 {
-	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "m4ModelMatrix");
+
+	//bind light direction
+	glm::vec3 v3Dir = glm::normalize(glm::vec3(glm::cos(glfwGetTime() * 2), glm::sin(glfwGetTime() * 2), 0));
+	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3LightDirection");
+	glUniform3fv(uniform_location, 3, glm::value_ptr(v3Dir));
+
+
+	 uniform_location = glGetUniformLocation(m_nShaderProgramID, "m4ModelMatrix");
 	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m4Model));
+
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "m3NormalMatrix");
+	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(glm::inverseTranspose(glm::mat3(m4Model))));
+
 
 	glBindVertexArray(nVAO);
 	glDrawElements(GL_TRIANGLES,nIndexSize , GL_UNSIGNED_INT, 0);

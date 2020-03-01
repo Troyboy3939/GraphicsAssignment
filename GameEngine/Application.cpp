@@ -52,7 +52,7 @@ Application::Application()
 		m_pGame = new Game();
 		m_pCamera = new FlyCamera(glm::vec3(0, 0, 1), glm::vec3(0), 16.0f / 9.0f, 3.14159f * 0.25f, 0.01f, 10000000.0f);
 		//m_pShader = new Shader("vert.shader", "colour.shader");
-		m_pShader = new Shader("TextureVert.shader", "TextureFrag.shader");
+		m_pShader = new Shader("vert.shader", "colour.shader");
 
 	}
 

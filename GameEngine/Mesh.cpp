@@ -106,7 +106,9 @@ void Mesh::InitializeQuad(Type eType)
 	m_anIndex_buffer = shape.m_anIndicies;
 
 
-	unsigned char* data = stbi_load("../Textures/Grass.jpg",&m_nX,&m_nY, &m_nN,0);
+	//Load Texture
+	 
+	//unsigned char* data = stbi_load("../Textures/Grass.jpg",&m_nX,&m_nY, &m_nN,0);
 
 	
 
@@ -122,11 +124,13 @@ void Mesh::InitializeQuad(Type eType)
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
 
+	////UV's
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2));
+	//
+	//NORMALS
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2));
-
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4)));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -137,15 +141,18 @@ void Mesh::InitializeQuad(Type eType)
 	m_nTriCount = shape.m_anIndicies.size() / 3;
 	
 
+	//----------------------------------------------------------------------------------------------------------------
+	//Texturing bullshit
+	//----------------------------------------------------------------------------------------------------------------
 
-	glGenTextures(1, &m_nTexture);
-	glBindTexture(GL_TEXTURE_2D, m_nTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nX, m_nY, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	stbi_image_free(data);
+	//glGenTextures(1, &m_nTexture);
+	//glBindTexture(GL_TEXTURE_2D, m_nTexture);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nX, m_nY, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	//
+	//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	//
+	//stbi_image_free(data);
 
 }
 
@@ -189,12 +196,19 @@ void Mesh::Draw(Shader* pShader)
 	}
 	else
 	{
+		//glBindTexture(GL_TEXTURE_2D,m_nTexture);
+
+		
+
+
+		//bind model matrix
 		pShader->Draw(m_m4Model,m_nVao,m_anIndex_buffer.size());
-		glBindTexture(GL_TEXTURE_2D,m_nTexture);
 
-		auto uniform_location = glGetUniformLocation(pShader->GetShaderProgram(), "m3NormalMatrix");
-		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(glm::inverseTranspose(glm::mat3(m_m4Model))));
+		//bind normal matrix
+		
 
+
+		//
 
 	}
 }

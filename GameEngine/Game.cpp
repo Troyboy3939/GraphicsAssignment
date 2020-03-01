@@ -25,7 +25,7 @@ void Game::Update(float fDeltaTime)
 {
 	
 
-	m_pCube->Rotate(0.5f * fDeltaTime, glm::vec3(0,1,0));
+	m_pCube->Rotate(0.5f * fDeltaTime, glm::vec3(0,0,1));
 }
 
 
