@@ -74,6 +74,7 @@ protected:
 	void CalculateTangents(std::vector<Vertex>& av3Verts, std::vector<unsigned int>& anIndicies);
 
 
+
 	struct MeshChunk
 	{
 		unsigned int m_nVao, m_nVbo, m_nIbo;

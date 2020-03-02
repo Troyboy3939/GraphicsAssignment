@@ -16,15 +16,26 @@ class Shader
 {
 public:
 	
-	Shader(std::string vertex, std::string fragment);
+	struct Light
+	{
+		glm::vec3 m_v3LightDirection;
+		glm::vec3 m_v3Diffuse;
+		glm::vec3 m_v3Specular;
+
+
+	};
+
+
+	Shader(std::string vertex, std::string fragment, FlyCamera* pCamera);
 	unsigned int GetVertexShader();
 	unsigned int GetFragmentShader();
 	unsigned int GetShaderProgram();
-	void Draw(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize);
+	void DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize);
 
 
-	void Update(FlyCamera* pCamera);
+	void Update();
 private:
+
 	void Vertex();
 	void Fragment();
 	void Link();
@@ -32,6 +43,9 @@ private:
 
 	GLint m_nSuccess;
 
+	FlyCamera* m_pCamera;
+	Light m_Light;
+	glm::vec3 m_v3AmbientLight;
 	std::string m_shaderData;
 
 	//Paths to shaders

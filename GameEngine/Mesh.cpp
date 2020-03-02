@@ -128,9 +128,11 @@ void Mesh::InitializeQuad(Type eType)
 	//glEnableVertexAttribArray(1);
 	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2));
 	//
+
+
 	//NORMALS
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(16));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -197,19 +199,7 @@ void Mesh::Draw(Shader* pShader)
 	else
 	{
 		//glBindTexture(GL_TEXTURE_2D,m_nTexture);
-
-		
-
-
-		//bind model matrix
-		pShader->Draw(m_m4Model,m_nVao,m_anIndex_buffer.size());
-
-		//bind normal matrix
-		
-
-
-		//
-
+		pShader->DrawMesh(m_m4Model,m_nVao,m_anIndex_buffer.size());
 	}
 }
 
@@ -603,6 +593,11 @@ void Mesh::CalculateTangents(std::vector<Vertex>& av3Verts, std::vector<unsigned
 	delete[] tan1;
 
 }
+
+
+
+
+
 
 Mesh::Material::~Material()
 {

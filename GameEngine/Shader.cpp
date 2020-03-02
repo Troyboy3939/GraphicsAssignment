@@ -1,7 +1,7 @@
 #include "Shader.h"
 #include "Camera.h"
 
-Shader::Shader(std::string vertex, std::string fragment)
+Shader::Shader(std::string vertex, std::string fragment, FlyCamera* pCamera)
 {
 	m_nSuccess = GL_FALSE;
 
@@ -13,6 +13,13 @@ Shader::Shader(std::string vertex, std::string fragment)
 	m_vertexPath << path << vertex;
 	m_fragmentPath << path << fragment;
 	
+	//Set lighting values
+	m_Light.m_v3Diffuse = {1,1,0};
+	m_Light.m_v3Specular = {1,1,1};
+	m_v3AmbientLight = glm::vec3(0.25f);
+
+	//Give Shader class pointer to camera
+	m_pCamera = pCamera;
 
 
 	//Create shaders
@@ -36,37 +43,82 @@ unsigned int Shader::GetShaderProgram()
 	return m_nShaderProgramID;
 }
 
-void Shader::Draw(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
+
+void Shader::DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 {
+	
+	glm::vec4 colour = glm::vec4(0.5f);
+
+
+	//Give Shader PV
+	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "m4PV");
+	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m_pCamera->GetProjectionView()));
+
+	glm::vec3 v3CamPos = glm::vec3(glm::inverse(m_pCamera->GetView())[3]);
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3CameraPos");
+	glUniformMatrix3fv(uniform_location, 1, false, glm::value_ptr(v3CamPos));
+
+
+	//LightDirection
+	m_Light.m_v3LightDirection = glm::normalize(glm::vec3(glm::cos(glfwGetTime() * 2), glm::sin(glfwGetTime() * 2), 0));
+
 
 	//bind light direction
-	glm::vec3 v3Dir = glm::normalize(glm::vec3(glm::cos(glfwGetTime() * 2), glm::sin(glfwGetTime() * 2), 0));
-	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3LightDirection");
-	glUniform3fv(uniform_location, 3, glm::value_ptr(v3Dir));
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3LightDirection");
+	glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.m_v3LightDirection));
+
+	//Bind Ambient light to shader
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Ia");
+	glUniform3fv(uniform_location, 1, glm::value_ptr(m_v3AmbientLight));
+
+	//Bind Diffuse light to shader
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Id");
+	glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.m_v3Diffuse));
+
+	//Bind Specular light to shader
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Is");
+	glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.m_v3Specular));
+
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "fSpecularPower");
+	glUniform1f(uniform_location,1);
+
+	//Bind Ambient Material Colour to shader
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Ka");
+	glUniform3fv(uniform_location, 1, glm::value_ptr(glm::vec3(1)));
 
 
-	 uniform_location = glGetUniformLocation(m_nShaderProgramID, "m4ModelMatrix");
+	//Bind Diffuse Material Colour to shader
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Kd");
+	glUniform3fv(uniform_location, 1, glm::value_ptr(glm::vec3(1)));
+
+
+	//Bind Specular Material Colour to shader
+	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Ks");
+	glUniform3fv(uniform_location, 1, glm::value_ptr(glm::vec3(1)));
+
+	//Give Model Matrix
+	  uniform_location = glGetUniformLocation(m_nShaderProgramID, "m4ModelMatrix");
 	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m4Model));
 
+
+	//Give Normal Matrix
 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "m3NormalMatrix");
 	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(glm::inverseTranspose(glm::mat3(m4Model))));
 
-
+	//Bind verts
 	glBindVertexArray(nVAO);
+
+	//Draw verts
 	glDrawElements(GL_TRIANGLES,nIndexSize , GL_UNSIGNED_INT, 0);
 }
 
-void Shader::Update(FlyCamera* pCamera)
+void Shader::Update()
 {
-	glm::vec4 color = glm::vec4(0.5f);
+
 
 	glUseProgram(m_nShaderProgramID);
-	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "m4PVM");
-	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pCamera->GetProjectionView()));
-	/*uniform_location = glGetUniformLocation(m_nShaderProgramID, "model_matrix");
-	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m4Model));*/
-	uniform_location = glGetUniformLocation(m_nShaderProgramID, "color");
-	glUniform4fv(uniform_location, 1, glm::value_ptr(color));
+
+
 
 }
 

@@ -6,7 +6,7 @@ int main()
 
 	Application* m_pApplication = new Application();
 
-	glClearColor(1, 1, 1, 1);
+	glClearColor(0.5f, 0.5f, 0.5f, 1);
 
 	//Game loop
 	while (glfwWindowShouldClose(m_pApplication->GetWindow()) == false && glfwGetKey(m_pApplication->GetWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS)

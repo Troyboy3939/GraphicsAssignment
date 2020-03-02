@@ -5,13 +5,15 @@ layout(location = 1) in vec4 v4Normal;
 
 
 out vec3 v3Normal;
+out vec4 v4Position;
 
-uniform mat4 m4PVM;
+uniform mat4 m4PV;
 uniform mat4 m4ModelMatrix;
 uniform mat3 m3NormalMatrix;
 
 void main()
 {
-	v3Normal = m3NormalMatrix * v3Normal.xyz;
-	gl_Position = (m4PVM * m4ModelMatrix) * v4LocalPosition;
+	v4Position = m4ModelMatrix * v4LocalPosition;
+	v3Normal = /*m3NormalMatrix */ v4Normal.xyz;
+	gl_Position = (m4PV * m4ModelMatrix) * v4LocalPosition;
 }
