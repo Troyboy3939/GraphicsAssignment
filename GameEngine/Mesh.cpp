@@ -401,8 +401,7 @@ bool Mesh::LoadModel(const char* szFileName, bool bLoadTextures, bool bFlipTextu
 
 void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
 {
-	int program = -1;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+	int program = pShader->GetShaderProgram();
 
 	if (program == -1) {
 		printf("No shader bound!\n");
@@ -410,12 +409,12 @@ void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
 	}
 
 	// pull uniforms from the shader
-	int kaUniform = glGetUniformLocation(program, "Ka");
-	int kdUniform = glGetUniformLocation(program, "Kd");
-	int ksUniform = glGetUniformLocation(program, "Ks");
-	int keUniform = glGetUniformLocation(program, "Ke");
+	int kaUniform = glGetUniformLocation(program, "v3Ka");
+	int kdUniform = glGetUniformLocation(program, "v3Kd");
+	int ksUniform = glGetUniformLocation(program, "v3Ks");
+	int keUniform = glGetUniformLocation(program, "v3Ke");
 	int opacityUniform = glGetUniformLocation(program, "opacity");
-	int specPowUniform = glGetUniformLocation(program, "specularPower");
+	int specPowUniform = glGetUniformLocation(program, "fSpecularPower");
 
 	int alphaTexUniform = glGetUniformLocation(program, "alphaTexture");
 	int ambientTexUniform = glGetUniformLocation(program, "ambientTexture");
@@ -509,8 +508,8 @@ void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
 		// bind and draw geometry
 		glBindVertexArray(c.m_nVao);
 
-		auto uniform_location = glGetUniformLocation(pShader->GetShaderProgram(), "model_matrix");
-		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m_m4Model));
+
+		pShader->DrawMesh(m_m4Model,c.m_nVao,c.m_nIndexCount);
 
 		if (bUsePatches)
 			glDrawElements(GL_PATCHES, c.m_nIndexCount, GL_UNSIGNED_INT, 0);

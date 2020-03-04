@@ -21,7 +21,7 @@ uniform vec3 v3LightDirection;
 
 
 
-out vec4 v3FragColour;
+out vec4 v4FragColour;
 
 void main()
 {
@@ -33,14 +33,14 @@ void main()
 	vec3 v3V = normalize(v3CameraPos - v4Position.xyz);
 	vec3 v3R = reflect(v3L, v3N);
 
-	float fSpecularTerm = pow(max(0,dot(v3R,v3V)),20);
+	float fSpecularTerm = pow(max(0,dot(v3R,v3V)),fSpecularPower);
 
 
 	vec3 v3Ambient = v3Ia * v3Ka;
 	vec3 v3Diffuse = v3Id * v3Kd * fLambertTerm;
 	vec3 v3Specular = v3Is * v3Ks * fSpecularTerm;
 	
-	v3FragColour = vec4(v3Ambient + v3Diffuse + v3Specular, 1);
+	v4FragColour = vec4(v3Ambient + v3Diffuse + v3Specular, 1);
 
 	//v3FragColour = vec4(v3N, 1);
 }

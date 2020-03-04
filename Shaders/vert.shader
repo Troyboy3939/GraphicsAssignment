@@ -14,6 +14,6 @@ uniform mat3 m3NormalMatrix;
 void main()
 {
 	v4Position = m4ModelMatrix * v4LocalPosition;
-	v3Normal = /*m3NormalMatrix */ v4Normal.xyz;
+	v3Normal = (m4ModelMatrix * vec4(v4Normal.xyz, 0)).xyz;
 	gl_Position = (m4PV * m4ModelMatrix) * v4LocalPosition;
 }

@@ -54,18 +54,20 @@ void Shader::DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 	auto uniform_location = glGetUniformLocation(m_nShaderProgramID, "m4PV");
 	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m_pCamera->GetProjectionView()));
 
-	glm::vec3 v3CamPos = glm::vec3(glm::inverse(m_pCamera->GetView())[3]);
-	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3CameraPos");
-	glUniformMatrix3fv(uniform_location, 1, false, glm::value_ptr(v3CamPos));
+	//float* data = ;
+ 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3CameraPos");
+	glUniform3fv(uniform_location, 1, glm::value_ptr(glm::vec3(m_pCamera->GetWorld()[3])));
 
 
 	//LightDirection
-	m_Light.m_v3LightDirection = glm::normalize(glm::vec3(glm::cos(glfwGetTime() * 2), glm::sin(glfwGetTime() * 2), 0));
+	m_Light.m_v3LightDirection = glm::vec3(1, 0, 0);// glm::normalize(glm::vec3(glm::cos(glfwGetTime() * 2), glm::sin(glfwGetTime() * 2), 0));
 
 
 	//bind light direction
 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3LightDirection");
 	glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.m_v3LightDirection));
+
+
 
 	//Bind Ambient light to shader
 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Ia");
@@ -79,8 +81,9 @@ void Shader::DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Is");
 	glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.m_v3Specular));
 
+	//Bind Specular Power
 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "fSpecularPower");
-	glUniform1f(uniform_location,1);
+	glUniform1f(uniform_location,32);
 
 	//Bind Ambient Material Colour to shader
 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Ka");

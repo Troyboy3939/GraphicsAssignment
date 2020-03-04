@@ -11,6 +11,7 @@ public:
 	void Draw(Shader* pShader);
 private:
 
-	Mesh* m_pCube;
+	Mesh* m_pDragon;
+	Mesh* m_pBunny;
 };
 
