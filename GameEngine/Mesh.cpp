@@ -109,7 +109,6 @@ void Mesh::InitializeQuad(Type eType)
 	//Load Texture
 	 
 	//unsigned char* data = stbi_load("../Textures/Grass.jpg",&m_nX,&m_nY, &m_nN,0);
-
 	
 
 	//bind
@@ -250,7 +249,7 @@ size_t Mesh::GetMaterialCount()
 	return m_aMaterials.size();
 }
 
-Mesh::Material& Mesh::GetMaterial(size_t index)
+Material& Mesh::GetMaterial(size_t index)
 {
 	return m_aMaterials[index];
 }
@@ -258,7 +257,7 @@ Mesh::Material& Mesh::GetMaterial(size_t index)
 
 bool Mesh::LoadModel(const char* szFileName, bool bLoadTextures, bool bFlipTextureV)
 {
-	
+
 
 	if (m_aMeshChunks.empty() == false)
 	{
@@ -286,116 +285,129 @@ bool Mesh::LoadModel(const char* szFileName, bool bLoadTextures, bool bFlipTextu
 	// copy materials
 	m_aMaterials.resize(materials.size());
 	int index = 0;
-	//for (auto& m : materials) {
-	//
-	//	m_materials[index].ambient = glm::vec3(m.ambient[0], m.ambient[1], m.ambient[2]);
-	//	m_materials[index].diffuse = glm::vec3(m.diffuse[0], m.diffuse[1], m.diffuse[2]);
-	//	m_materials[index].specular = glm::vec3(m.specular[0], m.specular[1], m.specular[2]);
-	//	m_materials[index].emissive = glm::vec3(m.emission[0], m.emission[1], m.emission[2]);
-	//	m_materials[index].specularPower = m.shininess;
-	//	m_materials[index].opacity = m.dissolve;
-	//
-	//	// textures
-	//	m_materials[index].alphaTexture.load((folder + m.alpha_texname).c_str());
-	//	m_materials[index].ambientTexture.load((folder + m.ambient_texname).c_str());
-	//	m_materials[index].diffuseTexture.load((folder + m.diffuse_texname).c_str());
-	//	m_materials[index].specularTexture.load((folder + m.specular_texname).c_str());
-	//	m_materials[index].specularHighlightTexture.load((folder + m.specular_highlight_texname).c_str());
-	//	m_materials[index].normalTexture.load((folder + m.bump_texname).c_str());
-	//	m_materials[index].displacementTexture.load((folder + m.displacement_texname).c_str());
-	//
-	//	++index;
-	//}
-
-	// copy shapes
-	m_aMeshChunks.reserve(shapes.size());
-	for (auto& s : shapes) 
+	for (auto& m : materials)
 	{
+		//Old Way
+	
+		//m_aMaterials[index].m_v3Ambient = glm::vec3(m.ambient[0], m.ambient[1], m.ambient[2]);
+		//m_aMaterials[index].m_v3Diffuse = glm::vec3(m.diffuse[0], m.diffuse[1], m.diffuse[2]);
+		//m_aMaterials[index].m_v3Specular = glm::vec3(m.specular[0], m.specular[1], m.specular[2]);
+		//m_aMaterials[index].m_v3Emisive = glm::vec3(m.emission[0], m.emission[1], m.emission[2]);
+		//m_aMaterials[index].m_fSpecularPower = m.shininess;
+		//m_aMaterials[index].m_fOpacity = m.dissolve;
 
-		MeshChunk chunk;
+		//New
+		m_aMaterials[index].SetDiffuse(glm::vec3(m.diffuse[0], m.diffuse[1], m.diffuse[2]));
+		m_aMaterials[index].SetSpecular(glm::vec3(m.specular[0], m.specular[1], m.specular[2]));
+		m_aMaterials[index].SetEmisive(glm::vec3(m.emission[0], m.emission[1], m.emission[2]));
+		m_aMaterials[index].SetSpecularPower(m.shininess);
 
-		// generate buffers
-		glGenBuffers(1, &chunk.m_nVbo);
-		glGenBuffers(1, &chunk.m_nIbo);
-		glGenVertexArrays(1, &chunk.m_nVao);
-
-		// bind vertex array aka a mesh wrapper
-		glBindVertexArray(chunk.m_nVao);
-
-		// set the index buffer data
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, chunk.m_nIbo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			s.mesh.indices.size() * sizeof(unsigned int),
-			s.mesh.indices.data(), GL_STATIC_DRAW);
-
-		// store index count for rendering
-		chunk.m_nIndexCount = (unsigned int)s.mesh.indices.size();
-
-		// create vertex data
-		std::vector<Vertex> vertices;
-		vertices.resize(s.mesh.positions.size() / 3);
-		size_t vertCount = vertices.size();
-
-		bool hasPosition = s.mesh.positions.empty() == false;
-		bool hasNormal = s.mesh.normals.empty() == false;
-		bool hasTexture = s.mesh.texcoords.empty() == false;
-
-		for (size_t i = 0; i < vertCount; ++i) {
-			if (hasPosition)
-				vertices[i].m_v4Position = glm::vec4(s.mesh.positions[i * 3 + 0], s.mesh.positions[i * 3 + 1], s.mesh.positions[i * 3 + 2], 1);
-			if (hasNormal)
-				vertices[i].m_v4Normal = glm::vec4(s.mesh.normals[i * 3 + 0], s.mesh.normals[i * 3 + 1], s.mesh.normals[i * 3 + 2], 0);
-
-			// flip the T / V (might not always be needed, depends on how mesh was made)
-			if (hasTexture)
-				vertices[i].m_v2TexCoord = glm::vec2(s.mesh.texcoords[i * 2 + 0], bFlipTextureV ? 1.0f - s.mesh.texcoords[i * 2 + 1] : s.mesh.texcoords[i * 2 + 1]);
-		}
-
-		// calculate for normal mapping
-		if (hasNormal && hasTexture)
-			CalculateTangents(vertices, s.mesh.indices);
-
-		// bind vertex buffer
-		glBindBuffer(GL_ARRAY_BUFFER, chunk.m_nVbo);
-
-		// fill vertex buffer
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
-
-		// enable first element as positions
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-
-		// enable normals
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 1));
-
-		// enable texture coords
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2));
-
-		// enable tangents
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2 + sizeof(glm::vec2)));
-
-		// bind 0 for safety
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		//Old Way
+	//	// textures
+	//	m_aMaterials[index].alphaTexture.load((folder + m.alpha_texname).c_str());
+	//	m_aMaterials[index].ambientTexture.load((folder + m.ambient_texname).c_str());
+	//	m_aMaterials[index].diffuseTexture.load((folder + m.diffuse_texname).c_str());
+	//	m_aMaterials[index].specularTexture.load((folder + m.specular_texname).c_str());
+	//	m_aMaterials[index].specularHighlightTexture.load((folder + m.specular_highlight_texname).c_str());
+	//	m_aMaterials[index].normalTexture.load((folder + m.bump_texname).c_str());
+	//	m_aMaterials[index].displacementTexture.load((folder + m.displacement_texname).c_str());
 
 
+		//New
+		m_aMaterials[index].GetDiffuseTexture()->Load(m.diffuse_texname.c_str(),false);
+		m_aMaterials[index].GetSpecularTexture()->Load(m.specular_texname.c_str(), false);
+		m_aMaterials[index].GetNormalTexture()->Load(m.bump_texname.c_str(), false);
+		
 
-		// set chunk material
-		chunk.m_nMaterialID = s.mesh.material_ids.empty() ? -1 : s.mesh.material_ids[0];
-
-		m_aMeshChunks.push_back(chunk);
+	
+		++index;
 	}
 
-	// load obj
-	return true;
+	// copy shapes
+		m_aMeshChunks.reserve(shapes.size());
+		for (auto& s : shapes)
+		{
+
+			MeshChunk chunk;
+
+			// generate buffers
+			glGenBuffers(1, &chunk.m_nVbo);
+			glGenBuffers(1, &chunk.m_nIbo);
+			glGenVertexArrays(1, &chunk.m_nVao);
+
+			// bind vertex array aka a mesh wrapper
+			glBindVertexArray(chunk.m_nVao);
+
+			// set the index buffer data
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, chunk.m_nIbo);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+				s.mesh.indices.size() * sizeof(unsigned int),
+				s.mesh.indices.data(), GL_STATIC_DRAW);
+
+			// store index count for rendering
+			chunk.m_nIndexCount = (unsigned int)s.mesh.indices.size();
+
+			// create vertex data
+			std::vector<Vertex> vertices;
+			vertices.resize(s.mesh.positions.size() / 3);
+			size_t vertCount = vertices.size();
+
+			bool hasPosition = s.mesh.positions.empty() == false;
+			bool hasNormal = s.mesh.normals.empty() == false;
+			bool hasTexture = s.mesh.texcoords.empty() == false;
+
+			for (size_t i = 0; i < vertCount; ++i) {
+				if (hasPosition)
+					vertices[i].m_v4Position = glm::vec4(s.mesh.positions[i * 3 + 0], s.mesh.positions[i * 3 + 1], s.mesh.positions[i * 3 + 2], 1);
+				if (hasNormal)
+					vertices[i].m_v4Normal = glm::vec4(s.mesh.normals[i * 3 + 0], s.mesh.normals[i * 3 + 1], s.mesh.normals[i * 3 + 2], 0);
+
+				// flip the T / V (might not always be needed, depends on how mesh was made)
+				if (hasTexture)
+					vertices[i].m_v2TexCoord = glm::vec2(s.mesh.texcoords[i * 2 + 0], bFlipTextureV ? 1.0f - s.mesh.texcoords[i * 2 + 1] : s.mesh.texcoords[i * 2 + 1]);
+			}
+
+			// calculate for normal mapping
+			if (hasNormal && hasTexture)
+				CalculateTangents(vertices, s.mesh.indices);
+
+			// bind vertex buffer
+			glBindBuffer(GL_ARRAY_BUFFER, chunk.m_nVbo);
+
+			// fill vertex buffer
+			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+			// enable first element as positions
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+
+			// enable normals
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 1));
+
+			// enable texture coords
+			glEnableVertexAttribArray(2);
+			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2));
+
+			// enable tangents
+			glEnableVertexAttribArray(3);
+			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2 + sizeof(glm::vec2)));
+
+			// bind 0 for safety
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
 
+			// set chunk material
+			chunk.m_nMaterialID = s.mesh.material_ids.empty() ? -1 : s.mesh.material_ids[0];
 
+			m_aMeshChunks.push_back(chunk);
+		}
+
+		// load obj
+		return true;
 
 }
 
@@ -409,17 +421,21 @@ void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
 	}
 
 	// pull uniforms from the shader
-	int kaUniform = glGetUniformLocation(program, "v3Ka");
-	int kdUniform = glGetUniformLocation(program, "v3Kd");
-	int ksUniform = glGetUniformLocation(program, "v3Ks");
-	int keUniform = glGetUniformLocation(program, "v3Ke");
-	int opacityUniform = glGetUniformLocation(program, "opacity");
-	int specPowUniform = glGetUniformLocation(program, "fSpecularPower");
 
 	int alphaTexUniform = glGetUniformLocation(program, "alphaTexture");
 	int ambientTexUniform = glGetUniformLocation(program, "ambientTexture");
 	int diffuseTexUniform = glGetUniformLocation(program, "diffuseTexture");
 	int specTexUniform = glGetUniformLocation(program, "specularTexture");
+
+
+
+	int kaUniform = glGetUniformLocation(program, "v3Ka");
+	int kdUniform = glGetUniformLocation(program, "v3Kd");
+	int ksUniform = glGetUniformLocation(program, "v3Ks");
+	int keUniform = glGetUniformLocation(program, "v3Ke");
+	int specPowUniform = glGetUniformLocation(program, "fSpecularPower");
+
+	int opacityUniform = glGetUniformLocation(program, "opacity");
 	int specHighlightTexUniform = glGetUniformLocation(program, "specularHighlightTexture");
 	int normalTexUniform = glGetUniformLocation(program, "normalTexture");
 	int dispTexUniform = glGetUniformLocation(program, "displacementTexture");
@@ -452,7 +468,7 @@ void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
 		//	if (kaUniform >= 0)
 		//		glUniform3fv(kaUniform, 1, &m_materials[currentMaterial].ambient[0]);
 		//	if (kdUniform >= 0)
-		//		glUniform3fv(kdUniform, 1, &m_materials[currentMaterial].diffuse[0]);
+		//		glUniform3fv(kdUniform, 1, &m_aMaterials[currentMaterial].m_v3Diffuse[0]);
 		//	if (ksUniform >= 0)
 		//		glUniform3fv(ksUniform, 1, &m_materials[currentMaterial].specular[0]);
 		//	if (keUniform >= 0)
@@ -504,7 +520,7 @@ void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
 		//	else if (dispTexUniform >= 0)
 		//		glBindTexture(GL_TEXTURE_2D, 0);
 		//}
-
+	
 		// bind and draw geometry
 		glBindVertexArray(c.m_nVao);
 
@@ -596,8 +612,3 @@ void Mesh::CalculateTangents(std::vector<Vertex>& av3Verts, std::vector<unsigned
 
 
 
-
-
-Mesh::Material::~Material()
-{
-}

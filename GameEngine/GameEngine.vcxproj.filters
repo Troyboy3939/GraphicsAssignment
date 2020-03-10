@@ -45,6 +45,12 @@
     <ClCompile Include="Primitives.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shaders\colour.shader">
@@ -57,6 +63,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\Shaders\TextureVert.Shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\FragLightTex.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\VertLightTex.shader">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -86,6 +98,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,7 +4,7 @@
 #include <Vector>
 #include <String>
 #include "Primitives.h"
-
+#include "Material.h"
 class Shader;
 
 class Mesh
@@ -34,23 +34,6 @@ public:
 		glm::vec2 m_v2TexCoord;
 		glm::vec4 m_v4Tangent;
 	};
-
-	class Material
-	{
-	public:
-		Material() : m_v3Ambient(1), m_v3Diffuse(1), m_v3Specular(0), m_fSpecularPower(1), m_fOpacity(1),m_v3Emmisive(glm::vec3(1)) {};
-		~Material();
-
-		glm::vec3 m_v3Ambient;
-		glm::vec3 m_v3Diffuse;
-		glm::vec3 m_v3Specular;
-		glm::vec3 m_v3Emmisive;
-
-
-		float m_fSpecularPower;
-		float m_fOpacity;
-	};
-
 
 
 	virtual void Draw(Shader* pShader);
