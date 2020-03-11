@@ -1,10 +1,10 @@
 #version 450
 
-in vec2 v2TexCoord;
-in vec3 v3Normal;
-in vec3 v3Tangent;
-in vec3 v3BiTangent;
-in vec4 v4Position;
+in vec2 v2OutTexCoord;
+in vec3 v3OutNormal;
+in vec3 v3OutTangent;
+in vec3 v3OutBiTangent;
+in vec4 v4OutPosition;
 
 
 uniform sampler2D diffuseTexture;
@@ -13,9 +13,13 @@ uniform sampler2D normalTexture;
 
 uniform vec3 v3CameraPos;
 
+
 uniform vec3 v3Ia; //Ambient Light colour
 uniform vec3 v3Id; //Diffuse light colour
 uniform vec3 v3Is; //Specular light colour
+uniform vec3 v3LightDirection;
+
+
 
 
 uniform vec3 v3Ka; //Ambient Material colour
@@ -23,7 +27,6 @@ uniform vec3 v3Kd; //Diffuse Material colour
 uniform vec3 v3Ks; //Specular Material colour
 uniform float fSpecularPower; //Material specular Power
 
-uniform vec3 v3LightDirection;
 
 
 
@@ -31,22 +34,22 @@ out vec4 v4FragColour;
 
 void main()
 {
-	vec3 v3N = normalize(v3Normal);
-	vec3 v3T = normalize(v3Tangent);
-	vec3 v3B = normalize(v3BiTangent);
+	vec3 v3N = normalize(v3OutNormal);
+	vec3 v3T = normalize(v3OutTangent);
+	vec3 v3B = normalize(v3OutBiTangent);
 	vec3 v3L = normalize(v3LightDirection);
 
 	mat3 m3TBN = mat3(v3T,v3B,v3N);
 
-	vec3 v3TexDiffuse = texture(diffuseTexture, v2TexCoord).rgb;
-	vec3 v3TexSpecular= texture(specularTexture, v2TexCoord).rgb;
-	vec3 v3TexNormal = texture(normalTexture, v2TexCoord).rgb;
+	vec3 v3TexDiffuse = texture(diffuseTexture, v2OutTexCoord).rgb;
+	vec3 v3TexSpecular= texture(specularTexture, v2OutTexCoord).rgb;
+	vec3 v3TexNormal = texture(normalTexture, v2OutTexCoord).rgb;
 
-	v3N = m3TBN * (v2TexCoord * 2 - 1);
+	v3N = m3TBN * (v3TexNormal* 2 - 1);
 
 	float fLambertTerm = max(0, min(1, dot(v3N,-v3L)));
 
-	vec3 v3V = normalize(v3CameraPos - v4Position.xyz);
+	vec3 v3V = normalize(v3CameraPos - v4OutPosition.xyz);
 	vec3 v3R = reflect(v3L, v3N);
 
 	float fSpecularTerm = pow(max(0,dot(v3R,v3V)),fSpecularPower);

@@ -461,23 +461,64 @@ void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
 	// draw the mesh chunks
 	for (auto& c : m_aMeshChunks) 
 	{
-
+		
 		// bind material
-		//if (currentMaterial != c.materialID) {
-		//	currentMaterial = c.materialID;
-		//	if (kaUniform >= 0)
-		//		glUniform3fv(kaUniform, 1, &m_materials[currentMaterial].ambient[0]);
-		//	if (kdUniform >= 0)
-		//		glUniform3fv(kdUniform, 1, &m_aMaterials[currentMaterial].m_v3Diffuse[0]);
-		//	if (ksUniform >= 0)
-		//		glUniform3fv(ksUniform, 1, &m_materials[currentMaterial].specular[0]);
-		//	if (keUniform >= 0)
-		//		glUniform3fv(keUniform, 1, &m_materials[currentMaterial].emissive[0]);
-		//	if (opacityUniform >= 0)
-		//		glUniform1f(opacityUniform, m_materials[currentMaterial].opacity);
-		//	if (specPowUniform >= 0)
-		//		glUniform1f(specPowUniform, m_materials[currentMaterial].specularPower);
-		//
+		if (currentMaterial != c.m_nMaterialID)
+		{
+			currentMaterial = c.m_nMaterialID;
+
+			if (kaUniform >= 0)
+				glUniform3fv(kaUniform, 1, &m_aMaterials[currentMaterial].GetAmbient()[0]);
+			if (kdUniform >= 0)
+				glUniform3fv(kdUniform, 1, &m_aMaterials[currentMaterial].GetDiffuse()[0]);
+			if (ksUniform >= 0)
+				glUniform3fv(ksUniform, 1, &m_aMaterials[currentMaterial].GetSpecular()[0]);
+			//	if (keUniform >= 0)
+			//		glUniform3fv(keUniform, 1, &m_materials[currentMaterial].emissive[0]);
+			//	if (opacityUniform >= 0)
+			//		glUniform1f(opacityUniform, m_materials[currentMaterial].opacity);
+			if (specPowUniform >= 0)
+				glUniform1f(specPowUniform, m_aMaterials[currentMaterial].GetSpecularPower());
+
+			for (int i = 0; i < m_aMaterials.size(); i++)
+			{
+				//Diffuse
+				glActiveTexture(m_aMaterials[currentMaterial].GetDiffuseTexture()->GetID());
+				if (m_aMaterials[currentMaterial].GetDiffuseTexture()->GetHandle() > 0)
+				{
+					glBindTexture(GL_TEXTURE_2D, m_aMaterials[currentMaterial].GetDiffuseTexture()->GetHandle());
+				}
+				else if (diffuseTexUniform >= 0)
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
+				}
+
+				//Specular
+				glActiveTexture(m_aMaterials[currentMaterial].GetSpecularTexture()->GetID());
+				if (m_aMaterials[currentMaterial].GetSpecularTexture()->GetHandle() > 0)
+				{
+					glBindTexture(GL_TEXTURE_2D, m_aMaterials[currentMaterial].GetSpecularTexture()->GetHandle());
+				}
+				else if (specTexUniform >= 0)
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
+				}
+
+
+				//Normal
+				glActiveTexture(m_aMaterials[currentMaterial].GetNormalTexture()->GetID());
+				if (m_aMaterials[currentMaterial].GetNormalTexture()->GetHandle() > 0)
+				{
+					glBindTexture(GL_TEXTURE_2D, m_aMaterials[currentMaterial].GetNormalTexture()->GetHandle());
+				}
+				else if (normalTexUniform >= 0)
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
+				}
+			}
+		}
+
+
 		//	glActiveTexture(GL_TEXTURE0);
 		//	if (m_materials[currentMaterial].diffuseTexture.getHandle() > 0)
 		//		glBindTexture(GL_TEXTURE_2D, m_materials[currentMaterial].diffuseTexture.getHandle());
@@ -522,7 +563,9 @@ void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
 		//}
 	
 		// bind and draw geometry
-		glBindVertexArray(c.m_nVao);
+
+		//No need to since its done in DrawMesh()
+		//glBindVertexArray(c.m_nVao);
 
 
 		pShader->DrawMesh(m_m4Model,c.m_nVao,c.m_nIndexCount);
@@ -536,6 +579,87 @@ void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
 		}
 	}
 
+}
+
+void Mesh::DrawModel(Shader* pShader)
+{
+	int nProgram = pShader->GetShaderProgram();
+
+	int nCameraUniform = glGetUniformLocation(nProgram, "v3CameraPosition");
+
+
+	//Get all uniforms
+
+		//Lighting
+	int nAmbientUniform = glGetUniformLocation(nProgram, "v3Ia");
+	int nDiffuseUniform = glGetUniformLocation(nProgram, "v3Id");
+	int nSpecularUniform = glGetUniformLocation(nProgram, "v3Is");
+	int nLightDirUniform = glGetUniformLocation(nProgram, "v3LightDirection");
+
+		//Material
+	int nAmbientMatUniform = glGetUniformLocation(nProgram, "v3Ka");
+	int nDiffuseMatUniform = glGetUniformLocation(nProgram, "v3Kd");
+	int nSpecularMatUniform = glGetUniformLocation(nProgram, "v3Ks");
+	int nSpecularPowerUniform = glGetUniformLocation(nProgram, "fSpecularPower");
+	
+
+		//Textures
+	int nDiffuseTextureUniform = glGetUniformLocation(nProgram, "diffuseTexture");
+	int nSpecularTextureUniform = glGetUniformLocation(nProgram, "SpecularTexture");
+	int nNormalTextureUniform = glGetUniformLocation(nProgram, "normalTexture");
+
+	Shader::Light* pLight = pShader->GetLight();
+
+	//Bind all uniforms
+
+		//Light Color
+
+			//Ambient
+	glUniform3fv(nAmbientUniform,1, glm::value_ptr(pLight->m_v3Ambient));
+
+			//Diffuse
+	glUniform3fv(nDiffuseUniform, 1, glm::value_ptr(pLight->m_v3Diffuse));
+
+		//Specular
+	glUniform3fv(nAmbientUniform, 1, glm::value_ptr(pLight->m_v3Specular));
+
+
+			//Light Direction
+	glUniform3fv(nLightDirUniform,1,glm::value_ptr(pLight->m_v3LightDirection));
+	
+		//Material Colour
+
+			//Ambient
+	glUniform3fv(nAmbientMatUniform, 1, glm::value_ptr(glm::vec3(1)));
+
+			//Diffuse
+	glUniform3fv(nDiffuseMatUniform, 1, glm::value_ptr(glm::vec3(1)));
+
+			//Specular
+	glUniform3fv(nSpecularMatUniform, 1, glm::value_ptr(glm::vec3(1)));
+
+
+
+	//Load each texture
+	for (int i = 0; i < m_aMaterials.size(); i++)
+	{
+		//Load Textures
+		m_aMaterials[i].GetDiffuseTexture()->Load("texturename",false);
+		m_aMaterials[i].GetSpecularTexture()->Load("texturename", false);
+		m_aMaterials[i].GetNormalTexture()->Load("texturename", false);
+
+	}
+	
+	//MeshChunks
+	for (int i = 0; i < m_aMeshChunks.size(); i++)
+	{
+		//Bind Textures
+
+		
+		//To this vao
+		glBindVertexArray(m_aMeshChunks[i].m_nVao);
+
+	}
 }
 
 std::string& Mesh::GetFileName()

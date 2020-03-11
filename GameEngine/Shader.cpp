@@ -16,7 +16,7 @@ Shader::Shader(std::string vertex, std::string fragment, FlyCamera* pCamera)
 	//Set lighting values
 	m_Light.m_v3Diffuse = {1,1,0};
 	m_Light.m_v3Specular = {1,1,1};
-	m_v3AmbientLight = glm::vec3(0.25f);
+	m_Light.m_v3Ambient = glm::vec3(0.25f);
 
 	//Give Shader class pointer to camera
 	m_pCamera = pCamera;
@@ -71,7 +71,7 @@ void Shader::DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 
 	//Bind Ambient light to shader
 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Ia");
-	glUniform3fv(uniform_location, 1, glm::value_ptr(m_v3AmbientLight));
+	glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.m_v3Ambient));
 
 	//Bind Diffuse light to shader
 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Id");
@@ -113,6 +113,11 @@ void Shader::DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 
 	//Draw verts
 	glDrawElements(GL_TRIANGLES,nIndexSize , GL_UNSIGNED_INT, 0);
+}
+
+Shader::Light* Shader::GetLight()
+{
+	return &m_Light;
 }
 
 void Shader::Update()

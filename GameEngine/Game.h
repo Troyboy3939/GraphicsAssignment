@@ -12,6 +12,5 @@ public:
 private:
 
 	Mesh* m_pDragon;
-	Mesh* m_pBunny;
 };
 

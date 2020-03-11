@@ -52,7 +52,8 @@ public:
 protected:
 	//Functions for OBJ loading
 	bool LoadModel(const char* szFileName, bool bLoadTextures = true, bool bFlipTextureV = false);
-	void DrawModel(Shader* pShader, bool bUsePatches = false);
+	void DrawModel(Shader* pShader, bool bUsePatches);
+	void DrawModel(Shader* pShader);
 	std::string& GetFileName();
 	void CalculateTangents(std::vector<Vertex>& av3Verts, std::vector<unsigned int>& anIndicies);
 

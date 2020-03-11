@@ -2,6 +2,7 @@
 
 Material::Material (glm::vec3 v3Ambient, glm::vec3 v3Diffuse, glm::vec3 v3Specular, float fSpecularPower, glm::vec3 v3Emisive)
 {
+	m_v3Ambient = v3Ambient;
 	m_v3Diffuse = v3Diffuse;
 	m_v3Specular = v3Specular;
 	m_v3Emisive = v3Emisive;
@@ -12,6 +13,11 @@ Material::Material (glm::vec3 v3Ambient, glm::vec3 v3Diffuse, glm::vec3 v3Specul
 	m_pNormal = new Texture();
 }
 
+
+glm::vec3 Material::GetAmbient()
+{
+	return m_v3Ambient;
+}
 
 glm::vec3 Material::GetDiffuse()
 {
@@ -46,6 +52,11 @@ Texture* Material::GetSpecularTexture()
 Texture* Material::GetNormalTexture()
 {
 	return m_pNormal;
+}
+
+void Material::SetAmbient(glm::vec3 v3Ambient)
+{
+	m_v3Ambient = v3Ambient;
 }
 
 void Material::SetDiffuse(glm::vec3 v3Diffuse)

@@ -17,7 +17,7 @@ uniform mat3 m3NormalMatrix;
 
 void main()
 {
-	v2TexCoord = v2TexCoord;
+	v2OutTexCoord = v2TexCoord;
 	v4OutPosition = m4ModelMatrix * v4LocalPosition;
 	v3OutNormal = (m4ModelMatrix * vec4(v4Normal.xyz, 0)).xyz;
 	v3OutTangent = m3NormalMatrix * v4Tangent.xyz;

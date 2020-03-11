@@ -21,7 +21,7 @@ public:
 		glm::vec3 m_v3LightDirection;
 		glm::vec3 m_v3Diffuse;
 		glm::vec3 m_v3Specular;
-
+		glm::vec3 m_v3Ambient;
 
 	};
 
@@ -31,7 +31,7 @@ public:
 	unsigned int GetFragmentShader();
 	unsigned int GetShaderProgram();
 	void DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize);
-
+	Light* GetLight();
 
 	void Update();
 private:
@@ -45,7 +45,6 @@ private:
 
 	FlyCamera* m_pCamera;
 	Light m_Light;
-	glm::vec3 m_v3AmbientLight;
 	std::string m_shaderData;
 
 	//Paths to shaders
