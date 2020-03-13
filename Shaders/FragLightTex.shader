@@ -8,7 +8,7 @@ in vec4 v4OutPosition;
 
 
 uniform sampler2D diffuseTexture;
-uniform sampler2D specularTexture;
+//uniform sampler2D specularTexture;
 uniform sampler2D normalTexture;
 
 uniform vec3 v3CameraPos;
@@ -42,7 +42,7 @@ void main()
 	mat3 m3TBN = mat3(v3T,v3B,v3N);
 
 	vec3 v3TexDiffuse = texture(diffuseTexture, v2OutTexCoord).rgb;
-	vec3 v3TexSpecular= texture(specularTexture, v2OutTexCoord).rgb;
+	//vec3 v3TexSpecular= texture(specularTexture, v2OutTexCoord).rgb;
 	vec3 v3TexNormal = texture(normalTexture, v2OutTexCoord).rgb;
 
 	v3N = m3TBN * (v3TexNormal* 2 - 1);
@@ -56,10 +56,8 @@ void main()
 
 
 	vec3 v3Ambient = v3Ia * v3Ka;
-	vec3 v3Diffuse = v3Id * v3Kd * fLambertTerm;
+	vec3 v3Diffuse = v3Id * v3Kd * v3TexDiffuse *  fLambertTerm;
 	vec3 v3Specular = v3Is * v3Ks * fSpecularTerm;
 	
 	v4FragColour = vec4(v3Ambient + v3Diffuse + v3Specular, 1);
-
-	//v3FragColour = vec4(v3N, 1);
 }

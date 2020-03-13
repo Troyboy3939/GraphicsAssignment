@@ -30,6 +30,7 @@ public:
 	unsigned int GetVertexShader();
 	unsigned int GetFragmentShader();
 	unsigned int GetShaderProgram();
+	FlyCamera* GetCamera();
 	void DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize);
 	Light* GetLight();
 

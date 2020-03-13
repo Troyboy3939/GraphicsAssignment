@@ -7,7 +7,7 @@
 class Material
 {
 public:
-	Material(glm::vec3 v3Ambient = glm::vec3(1), glm::vec3 v3Diffuse = glm::vec3(1), glm::vec3 v3Specular = glm::vec3(0), float fSpecularPower = 1.0f, glm::vec3 v3Emisive = glm::vec3(1));
+	Material(GLenum eID, glm::vec3 v3Ambient = glm::vec3(1), glm::vec3 v3Diffuse = glm::vec3(1), glm::vec3 v3Specular = glm::vec3(0), float fSpecularPower = 1.0f, glm::vec3 v3Emisive = glm::vec3(1));
 
 
 	//Get

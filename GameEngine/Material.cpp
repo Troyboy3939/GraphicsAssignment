@@ -1,6 +1,6 @@
 #include "Material.h"
 
-Material::Material (glm::vec3 v3Ambient, glm::vec3 v3Diffuse, glm::vec3 v3Specular, float fSpecularPower, glm::vec3 v3Emisive)
+Material::Material (GLenum eID, glm::vec3 v3Ambient, glm::vec3 v3Diffuse, glm::vec3 v3Specular, float fSpecularPower, glm::vec3 v3Emisive)
 {
 	m_v3Ambient = v3Ambient;
 	m_v3Diffuse = v3Diffuse;
@@ -8,9 +8,9 @@ Material::Material (glm::vec3 v3Ambient, glm::vec3 v3Diffuse, glm::vec3 v3Specul
 	m_v3Emisive = v3Emisive;
 	m_fSpecularPower = fSpecularPower;
 
-	m_pDiffuse = new Texture();
-	m_pSpecular = new Texture();
-	m_pNormal = new Texture();
+	m_pDiffuse = new Texture(eID);
+	m_pSpecular = nullptr;
+	m_pNormal = new Texture(eID + 1);
 }
 
 

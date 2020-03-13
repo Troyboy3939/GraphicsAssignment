@@ -26,7 +26,7 @@ void Game::Update(float fDeltaTime)
 {
 	
 
-	m_pDragon->Rotate(0.5f * fDeltaTime, glm::vec3(0,1,0));
+	//m_pDragon->Rotate(0.5f * fDeltaTime, glm::vec3(0,1,0));
 
 }
 

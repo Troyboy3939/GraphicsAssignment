@@ -43,6 +43,11 @@ unsigned int Shader::GetShaderProgram()
 	return m_nShaderProgramID;
 }
 
+FlyCamera* Shader::GetCamera()
+{
+	return m_pCamera;
+}
+
 
 void Shader::DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 {
@@ -60,7 +65,7 @@ void Shader::DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 
 
 	//LightDirection
-	m_Light.m_v3LightDirection = glm::vec3(1, 0, 0);// glm::normalize(glm::vec3(glm::cos(glfwGetTime() * 2), glm::sin(glfwGetTime() * 2), 0));
+	m_Light.m_v3LightDirection = glm::vec3(-1, 0, 0);// glm::normalize(glm::vec3(glm::cos(glfwGetTime() * 2), glm::sin(glfwGetTime() * 2), 0));
 
 
 	//bind light direction

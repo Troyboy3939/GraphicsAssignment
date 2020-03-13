@@ -71,7 +71,7 @@ protected:
 
 	std::string m_sFileName;
 	std::vector<MeshChunk> m_aMeshChunks;
-	std::vector<Material> m_aMaterials;
+	std::vector<Material*> m_aMaterials;
 
 
 

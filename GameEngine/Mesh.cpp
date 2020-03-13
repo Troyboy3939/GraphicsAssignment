@@ -251,7 +251,7 @@ size_t Mesh::GetMaterialCount()
 
 Material& Mesh::GetMaterial(size_t index)
 {
-	return m_aMaterials[index];
+	return *m_aMaterials[index];
 }
 
 
@@ -282,46 +282,8 @@ bool Mesh::LoadModel(const char* szFileName, bool bLoadTextures, bool bFlipTextu
 
 	m_sFileName = szFileName;
 
-	// copy materials
-	m_aMaterials.resize(materials.size());
-	int index = 0;
-	for (auto& m : materials)
-	{
-		//Old Way
-	
-		//m_aMaterials[index].m_v3Ambient = glm::vec3(m.ambient[0], m.ambient[1], m.ambient[2]);
-		//m_aMaterials[index].m_v3Diffuse = glm::vec3(m.diffuse[0], m.diffuse[1], m.diffuse[2]);
-		//m_aMaterials[index].m_v3Specular = glm::vec3(m.specular[0], m.specular[1], m.specular[2]);
-		//m_aMaterials[index].m_v3Emisive = glm::vec3(m.emission[0], m.emission[1], m.emission[2]);
-		//m_aMaterials[index].m_fSpecularPower = m.shininess;
-		//m_aMaterials[index].m_fOpacity = m.dissolve;
-
-		//New
-		m_aMaterials[index].SetDiffuse(glm::vec3(m.diffuse[0], m.diffuse[1], m.diffuse[2]));
-		m_aMaterials[index].SetSpecular(glm::vec3(m.specular[0], m.specular[1], m.specular[2]));
-		m_aMaterials[index].SetEmisive(glm::vec3(m.emission[0], m.emission[1], m.emission[2]));
-		m_aMaterials[index].SetSpecularPower(m.shininess);
-
-		//Old Way
-	//	// textures
-	//	m_aMaterials[index].alphaTexture.load((folder + m.alpha_texname).c_str());
-	//	m_aMaterials[index].ambientTexture.load((folder + m.ambient_texname).c_str());
-	//	m_aMaterials[index].diffuseTexture.load((folder + m.diffuse_texname).c_str());
-	//	m_aMaterials[index].specularTexture.load((folder + m.specular_texname).c_str());
-	//	m_aMaterials[index].specularHighlightTexture.load((folder + m.specular_highlight_texname).c_str());
-	//	m_aMaterials[index].normalTexture.load((folder + m.bump_texname).c_str());
-	//	m_aMaterials[index].displacementTexture.load((folder + m.displacement_texname).c_str());
-
-
-		//New
-		m_aMaterials[index].GetDiffuseTexture()->Load(m.diffuse_texname.c_str(),false);
-		m_aMaterials[index].GetSpecularTexture()->Load(m.specular_texname.c_str(), false);
-		m_aMaterials[index].GetNormalTexture()->Load(m.bump_texname.c_str(), false);
-		
 
 	
-		++index;
-	}
 
 	// copy shapes
 		m_aMeshChunks.reserve(shapes.size());
@@ -406,178 +368,29 @@ bool Mesh::LoadModel(const char* szFileName, bool bLoadTextures, bool bFlipTextu
 			m_aMeshChunks.push_back(chunk);
 		}
 
+		//Textures
+
+		for (int i = 0; i < m_aMeshChunks.size(); i++)
+		{
+			m_aMaterials.push_back(new Material(GL_TEXTURE0));
+		}
+			
+		//Load Textures
+		m_aMaterials[0]->GetDiffuseTexture()->Load("UVAlbedoMap_Shield.png", true);
+		//m_aMaterials[i].GetSpecularTexture()->Load("texturename", false);
+		m_aMaterials[0]->GetNormalTexture()->Load("UVNormalMap_Shield.png", true);
+
+
+		//Load Textures
+		m_aMaterials[1]->GetDiffuseTexture()->Load("UVAlbedoMap_Sword.png", true);
+		//m_aMaterials[i].GetSpecularTexture()->Load("texturename", false);
+		m_aMaterials[1]->GetNormalTexture()->Load("UVNormalMap_Sword.png", true);
+
+
+
+
 		// load obj
 		return true;
-
-}
-
-void Mesh::DrawModel(Shader* pShader, bool bUsePatches)
-{
-	int program = pShader->GetShaderProgram();
-
-	if (program == -1) {
-		printf("No shader bound!\n");
-		return;
-	}
-
-	// pull uniforms from the shader
-
-	int alphaTexUniform = glGetUniformLocation(program, "alphaTexture");
-	int ambientTexUniform = glGetUniformLocation(program, "ambientTexture");
-	int diffuseTexUniform = glGetUniformLocation(program, "diffuseTexture");
-	int specTexUniform = glGetUniformLocation(program, "specularTexture");
-
-
-
-	int kaUniform = glGetUniformLocation(program, "v3Ka");
-	int kdUniform = glGetUniformLocation(program, "v3Kd");
-	int ksUniform = glGetUniformLocation(program, "v3Ks");
-	int keUniform = glGetUniformLocation(program, "v3Ke");
-	int specPowUniform = glGetUniformLocation(program, "fSpecularPower");
-
-	int opacityUniform = glGetUniformLocation(program, "opacity");
-	int specHighlightTexUniform = glGetUniformLocation(program, "specularHighlightTexture");
-	int normalTexUniform = glGetUniformLocation(program, "normalTexture");
-	int dispTexUniform = glGetUniformLocation(program, "displacementTexture");
-
-	// set texture slots (these don't change per material)
-	if (diffuseTexUniform >= 0)
-		glUniform1i(diffuseTexUniform, 0);
-	if (alphaTexUniform >= 0)
-		glUniform1i(alphaTexUniform, 1);
-	if (ambientTexUniform >= 0)
-		glUniform1i(ambientTexUniform, 2);
-	if (specTexUniform >= 0)
-		glUniform1i(specTexUniform, 3);
-	if (specHighlightTexUniform >= 0)
-		glUniform1i(specHighlightTexUniform, 4);
-	if (normalTexUniform >= 0)
-		glUniform1i(normalTexUniform, 5);
-	if (dispTexUniform >= 0)
-		glUniform1i(dispTexUniform, 6);
-
-	int currentMaterial = -1;
-
-	// draw the mesh chunks
-	for (auto& c : m_aMeshChunks) 
-	{
-		
-		// bind material
-		if (currentMaterial != c.m_nMaterialID)
-		{
-			currentMaterial = c.m_nMaterialID;
-
-			if (kaUniform >= 0)
-				glUniform3fv(kaUniform, 1, &m_aMaterials[currentMaterial].GetAmbient()[0]);
-			if (kdUniform >= 0)
-				glUniform3fv(kdUniform, 1, &m_aMaterials[currentMaterial].GetDiffuse()[0]);
-			if (ksUniform >= 0)
-				glUniform3fv(ksUniform, 1, &m_aMaterials[currentMaterial].GetSpecular()[0]);
-			//	if (keUniform >= 0)
-			//		glUniform3fv(keUniform, 1, &m_materials[currentMaterial].emissive[0]);
-			//	if (opacityUniform >= 0)
-			//		glUniform1f(opacityUniform, m_materials[currentMaterial].opacity);
-			if (specPowUniform >= 0)
-				glUniform1f(specPowUniform, m_aMaterials[currentMaterial].GetSpecularPower());
-
-			for (int i = 0; i < m_aMaterials.size(); i++)
-			{
-				//Diffuse
-				glActiveTexture(m_aMaterials[currentMaterial].GetDiffuseTexture()->GetID());
-				if (m_aMaterials[currentMaterial].GetDiffuseTexture()->GetHandle() > 0)
-				{
-					glBindTexture(GL_TEXTURE_2D, m_aMaterials[currentMaterial].GetDiffuseTexture()->GetHandle());
-				}
-				else if (diffuseTexUniform >= 0)
-				{
-					glBindTexture(GL_TEXTURE_2D, 0);
-				}
-
-				//Specular
-				glActiveTexture(m_aMaterials[currentMaterial].GetSpecularTexture()->GetID());
-				if (m_aMaterials[currentMaterial].GetSpecularTexture()->GetHandle() > 0)
-				{
-					glBindTexture(GL_TEXTURE_2D, m_aMaterials[currentMaterial].GetSpecularTexture()->GetHandle());
-				}
-				else if (specTexUniform >= 0)
-				{
-					glBindTexture(GL_TEXTURE_2D, 0);
-				}
-
-
-				//Normal
-				glActiveTexture(m_aMaterials[currentMaterial].GetNormalTexture()->GetID());
-				if (m_aMaterials[currentMaterial].GetNormalTexture()->GetHandle() > 0)
-				{
-					glBindTexture(GL_TEXTURE_2D, m_aMaterials[currentMaterial].GetNormalTexture()->GetHandle());
-				}
-				else if (normalTexUniform >= 0)
-				{
-					glBindTexture(GL_TEXTURE_2D, 0);
-				}
-			}
-		}
-
-
-		//	glActiveTexture(GL_TEXTURE0);
-		//	if (m_materials[currentMaterial].diffuseTexture.getHandle() > 0)
-		//		glBindTexture(GL_TEXTURE_2D, m_materials[currentMaterial].diffuseTexture.getHandle());
-		//	else if (diffuseTexUniform >= 0)
-		//		glBindTexture(GL_TEXTURE_2D, 0);
-		//
-		//	glActiveTexture(GL_TEXTURE1);
-		//	if (m_materials[currentMaterial].alphaTexture.getHandle() > 0)
-		//		glBindTexture(GL_TEXTURE_2D, m_materials[currentMaterial].alphaTexture.getHandle());
-		//	else if (alphaTexUniform >= 0)
-		//		glBindTexture(GL_TEXTURE_2D, 0);
-		//
-		//	glActiveTexture(GL_TEXTURE2);
-		//	if (m_materials[currentMaterial].ambientTexture.getHandle() > 0)
-		//		glBindTexture(GL_TEXTURE_2D, m_materials[currentMaterial].ambientTexture.getHandle());
-		//	else if (ambientTexUniform >= 0)
-		//		glBindTexture(GL_TEXTURE_2D, 0);
-		//
-		//	glActiveTexture(GL_TEXTURE3);
-		//	if (m_materials[currentMaterial].specularTexture.getHandle() > 0)
-		//		glBindTexture(GL_TEXTURE_2D, m_materials[currentMaterial].specularTexture.getHandle());
-		//	else if (specTexUniform >= 0)
-		//		glBindTexture(GL_TEXTURE_2D, 0);
-		//
-		//	glActiveTexture(GL_TEXTURE4);
-		//	if (m_materials[currentMaterial].specularHighlightTexture.getHandle() > 0)
-		//		glBindTexture(GL_TEXTURE_2D, m_materials[currentMaterial].specularHighlightTexture.getHandle());
-		//	else if (specHighlightTexUniform >= 0)
-		//		glBindTexture(GL_TEXTURE_2D, 0);
-		//
-		//	glActiveTexture(GL_TEXTURE5);
-		//	if (m_materials[currentMaterial].normalTexture.getHandle() > 0)
-		//		glBindTexture(GL_TEXTURE_2D, m_materials[currentMaterial].normalTexture.getHandle());
-		//	else if (normalTexUniform >= 0)
-		//		glBindTexture(GL_TEXTURE_2D, 0);
-		//
-		//	glActiveTexture(GL_TEXTURE6);
-		//	if (m_materials[currentMaterial].displacementTexture.getHandle() > 0)
-		//		glBindTexture(GL_TEXTURE_2D, m_materials[currentMaterial].displacementTexture.getHandle());
-		//	else if (dispTexUniform >= 0)
-		//		glBindTexture(GL_TEXTURE_2D, 0);
-		//}
-	
-		// bind and draw geometry
-
-		//No need to since its done in DrawMesh()
-		//glBindVertexArray(c.m_nVao);
-
-
-		pShader->DrawMesh(m_m4Model,c.m_nVao,c.m_nIndexCount);
-
-		if (bUsePatches)
-			glDrawElements(GL_PATCHES, c.m_nIndexCount, GL_UNSIGNED_INT, 0);
-		else
-		{
-			glDrawElements(GL_TRIANGLES, c.m_nIndexCount, GL_UNSIGNED_INT, 0);
-
-		}
-	}
 
 }
 
@@ -585,81 +398,116 @@ void Mesh::DrawModel(Shader* pShader)
 {
 	int nProgram = pShader->GetShaderProgram();
 
-	int nCameraUniform = glGetUniformLocation(nProgram, "v3CameraPosition");
+	//Camera Position
+	auto nUniformLocation = glGetUniformLocation(nProgram, "v3CameraPos");
+	glUniform3fv(nUniformLocation, 1, glm::value_ptr(pShader->GetCamera()->GetWorld(3)));
 
+
+	//Projection View
+	nUniformLocation = glGetUniformLocation(nProgram, "m4PV");//
+	glUniformMatrix4fv(nUniformLocation, 1, false, glm::value_ptr(pShader->GetCamera()->GetProjectionView()));
+
+
+	//Model Matrix
+	nUniformLocation = glGetUniformLocation(nProgram, "m4ModelMatrix");
+	glUniformMatrix4fv(nUniformLocation, 1, false, glm::value_ptr(m_m4Model));
+
+	//Normal Matrix
+	nUniformLocation = glGetUniformLocation(nProgram, "m3NormalMatrix");
+	glUniformMatrix3fv(nUniformLocation, 1, false, glm::value_ptr(glm::inverseTranspose(glm::mat3(m_m4Model))));
 
 	//Get all uniforms
 
-		//Lighting
-	int nAmbientUniform = glGetUniformLocation(nProgram, "v3Ia");
-	int nDiffuseUniform = glGetUniformLocation(nProgram, "v3Id");
-	int nSpecularUniform = glGetUniformLocation(nProgram, "v3Is");
-	int nLightDirUniform = glGetUniformLocation(nProgram, "v3LightDirection");
-
-		//Material
-	int nAmbientMatUniform = glGetUniformLocation(nProgram, "v3Ka");
-	int nDiffuseMatUniform = glGetUniformLocation(nProgram, "v3Kd");
-	int nSpecularMatUniform = glGetUniformLocation(nProgram, "v3Ks");
-	int nSpecularPowerUniform = glGetUniformLocation(nProgram, "fSpecularPower");
-	
-
-		//Textures
-	int nDiffuseTextureUniform = glGetUniformLocation(nProgram, "diffuseTexture");
-	int nSpecularTextureUniform = glGetUniformLocation(nProgram, "SpecularTexture");
-	int nNormalTextureUniform = glGetUniformLocation(nProgram, "normalTexture");
-
 	Shader::Light* pLight = pShader->GetLight();
 
-	//Bind all uniforms
+				//Ambient
+	nUniformLocation = glGetUniformLocation(nProgram, "v3Ia");//
+	glUniform3fv(nUniformLocation, 1, glm::value_ptr(pLight->m_v3Ambient));
 
-		//Light Color
 
-			//Ambient
-	glUniform3fv(nAmbientUniform,1, glm::value_ptr(pLight->m_v3Ambient));
+				//Diffuse
+	nUniformLocation = glGetUniformLocation(nProgram, "v3Id");//
+	glUniform3fv(nUniformLocation, 1, glm::value_ptr(pLight->m_v3Diffuse));
 
-			//Diffuse
-	glUniform3fv(nDiffuseUniform, 1, glm::value_ptr(pLight->m_v3Diffuse));
 
 		//Specular
-	glUniform3fv(nAmbientUniform, 1, glm::value_ptr(pLight->m_v3Specular));
+	nUniformLocation = glGetUniformLocation(nProgram, "v3Is");//
+	glUniform3fv(nUniformLocation, 1, glm::value_ptr(pLight->m_v3Specular));
 
 
-			//Light Direction
-	glUniform3fv(nLightDirUniform,1,glm::value_ptr(pLight->m_v3LightDirection));
+				//Light Direction
+	pLight->m_v3LightDirection = glm::vec3(-1, 0, 0);
+
+	nUniformLocation = glGetUniformLocation(nProgram, "v3LightDirection");//
+	glUniform3fv(nUniformLocation, 1, glm::value_ptr(pLight->m_v3LightDirection));
+		//Material
+
+
+	nUniformLocation = glGetUniformLocation(nProgram, "v3Ka");//
+	glUniform3fv(nUniformLocation, 1, glm::value_ptr(glm::vec3(1)));
+	nUniformLocation = glGetUniformLocation(nProgram, "v3Kd");//
+	glUniform3fv(nUniformLocation, 1, glm::value_ptr(glm::vec3(1)));
+
+	nUniformLocation = glGetUniformLocation(nProgram, "v3Ks");//
+	glUniform3fv(nUniformLocation, 1, glm::value_ptr(glm::vec3(1)));
+
+	nUniformLocation = glGetUniformLocation(nProgram, "fSpecularPower");//
+	glUniform1f(nUniformLocation,30);
+
+	//For Materials
+
 	
-		//Material Colour
+		
 
-			//Ambient
-	glUniform3fv(nAmbientMatUniform, 1, glm::value_ptr(glm::vec3(1)));
-
-			//Diffuse
-	glUniform3fv(nDiffuseMatUniform, 1, glm::value_ptr(glm::vec3(1)));
-
-			//Specular
-	glUniform3fv(nSpecularMatUniform, 1, glm::value_ptr(glm::vec3(1)));
-
-
-
-	//Load each texture
-	for (int i = 0; i < m_aMaterials.size(); i++)
-	{
-		//Load Textures
-		m_aMaterials[i].GetDiffuseTexture()->Load("texturename",false);
-		m_aMaterials[i].GetSpecularTexture()->Load("texturename", false);
-		m_aMaterials[i].GetNormalTexture()->Load("texturename", false);
-
-	}
-	
-	//MeshChunks
-	for (int i = 0; i < m_aMeshChunks.size(); i++)
-	{
 		//Bind Textures
+			//Diffuse
+		nUniformLocation = glGetUniformLocation(nProgram, "diffuseTexture");
+		glUniform1i(nUniformLocation,0);
+		
+
+		glActiveTexture(m_aMaterials[0]->GetDiffuseTexture()->GetID());
+		glBindTexture(GL_TEXTURE_2D, m_aMaterials[0]->GetDiffuseTexture()->GetHandle());
+			//Normal
 
 		
-		//To this vao
-		glBindVertexArray(m_aMeshChunks[i].m_nVao);
+		nUniformLocation = glGetUniformLocation(nProgram, "normalTexture");
+		glUniform1i(nUniformLocation, 1);
+		glActiveTexture(m_aMaterials[0]->GetNormalTexture()->GetID());
+		glBindTexture(GL_TEXTURE_2D, m_aMaterials[0]->GetNormalTexture()->GetHandle());
 
-	}
+
+		//To this vao
+		glBindVertexArray(m_aMeshChunks[0].m_nVao);
+
+		//And then draw the verts 
+		glDrawElements(GL_TRIANGLES, m_aMeshChunks[0].m_nIndexCount, GL_UNSIGNED_INT,0);
+
+
+		//Bind Textures
+			//Diffuse
+		nUniformLocation = glGetUniformLocation(nProgram, "diffuseTexture");
+		glUniform1i(nUniformLocation, 0);
+
+
+		glActiveTexture(m_aMaterials[1]->GetDiffuseTexture()->GetID());
+		glBindTexture(GL_TEXTURE_2D, m_aMaterials[1]->GetDiffuseTexture()->GetHandle());
+		//Normal
+
+
+		nUniformLocation = glGetUniformLocation(nProgram, "normalTexture");
+		glUniform1i(nUniformLocation, 1);
+		glActiveTexture(m_aMaterials[1]->GetNormalTexture()->GetID());
+		glBindTexture(GL_TEXTURE_2D, m_aMaterials[1]->GetNormalTexture()->GetHandle());
+
+
+		//To this vao
+		glBindVertexArray(m_aMeshChunks[1].m_nVao);
+
+		//And then draw the verts 
+		glDrawElements(GL_TRIANGLES, m_aMeshChunks[1].m_nIndexCount, GL_UNSIGNED_INT, 0);
+
+		
+	
 }
 
 std::string& Mesh::GetFileName()
