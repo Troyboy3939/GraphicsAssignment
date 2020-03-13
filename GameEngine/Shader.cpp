@@ -14,9 +14,15 @@ Shader::Shader(std::string vertex, std::string fragment, FlyCamera* pCamera)
 	m_fragmentPath << path << fragment;
 	
 	//Set lighting values
-	m_Light.m_v3Diffuse = {1,1,0};
-	m_Light.m_v3Specular = {1,1,1};
-	m_Light.m_v3Ambient = glm::vec3(0.25f);
+	
+	m_aLights.push_back(new Light(glm::vec3(-1, 0, 0), glm::vec3(1, 0, 0), glm::vec3(1, 1, 1)));
+	m_aLights.push_back(new Light(glm::vec3(1, 0, 0), glm::vec3(0, 0, 1), glm::vec3(1, 1, 1)));
+
+
+
+
+
+	m_v3Ambient = glm::vec3(0.25f);
 
 	//Give Shader class pointer to camera
 	m_pCamera = pCamera;
@@ -64,27 +70,13 @@ void Shader::DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 	glUniform3fv(uniform_location, 1, glm::value_ptr(glm::vec3(m_pCamera->GetWorld()[3])));
 
 
-	//LightDirection
-	m_Light.m_v3LightDirection = glm::vec3(-1, 0, 0);// glm::normalize(glm::vec3(glm::cos(glfwGetTime() * 2), glm::sin(glfwGetTime() * 2), 0));
 
-
-	//bind light direction
-	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3LightDirection");
-	glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.m_v3LightDirection));
-
-
+	BindLights();
 
 	//Bind Ambient light to shader
 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Ia");
-	glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.m_v3Ambient));
+	glUniform3fv(uniform_location, 1, glm::value_ptr(m_v3Ambient));
 
-	//Bind Diffuse light to shader
-	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Id");
-	glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.m_v3Diffuse));
-
-	//Bind Specular light to shader
-	uniform_location = glGetUniformLocation(m_nShaderProgramID, "v3Is");
-	glUniform3fv(uniform_location, 1, glm::value_ptr(m_Light.m_v3Specular));
 
 	//Bind Specular Power
 	uniform_location = glGetUniformLocation(m_nShaderProgramID, "fSpecularPower");
@@ -120,9 +112,16 @@ void Shader::DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize)
 	glDrawElements(GL_TRIANGLES,nIndexSize , GL_UNSIGNED_INT, 0);
 }
 
-Shader::Light* Shader::GetLight()
+void Shader::BindLights()
 {
-	return &m_Light;
+
+	for (int i = 0; i < m_aLights.size(); i++)
+	{
+		m_aLights[i]->BindUniforms(m_nShaderProgramID, i);
+	}
+
+
+
 }
 
 void Shader::Update()

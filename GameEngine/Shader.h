@@ -10,21 +10,12 @@
 #include <Vector>
 #include <iostream>
 #include "FlyCamera.h"
+#include "Light.h"
 
 
 class Shader
 {
 public:
-	
-	struct Light
-	{
-		glm::vec3 m_v3LightDirection;
-		glm::vec3 m_v3Diffuse;
-		glm::vec3 m_v3Specular;
-		glm::vec3 m_v3Ambient;
-
-	};
-
 
 	Shader(std::string vertex, std::string fragment, FlyCamera* pCamera);
 	unsigned int GetVertexShader();
@@ -32,9 +23,10 @@ public:
 	unsigned int GetShaderProgram();
 	FlyCamera* GetCamera();
 	void DrawMesh(glm::mat4 m4Model, unsigned int nVAO, int nIndexSize);
-	Light* GetLight();
+	void BindLights();
 
 	void Update();
+	glm::vec3 m_v3Ambient;
 private:
 
 	void Vertex();
@@ -45,8 +37,13 @@ private:
 	GLint m_nSuccess;
 
 	FlyCamera* m_pCamera;
-	Light m_Light;
+
+	
+	std::vector<Light*> m_aLights;
+
 	std::string m_shaderData;
+
+
 
 	//Paths to shaders
 	std::stringstream m_vertexPath;

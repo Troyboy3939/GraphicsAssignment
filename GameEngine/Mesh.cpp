@@ -418,28 +418,10 @@ void Mesh::DrawModel(Shader* pShader)
 
 	//Get all uniforms
 
-	Shader::Light* pLight = pShader->GetLight();
+	pShader->BindLights();
 
-				//Ambient
-	nUniformLocation = glGetUniformLocation(nProgram, "v3Ia");//
-	glUniform3fv(nUniformLocation, 1, glm::value_ptr(pLight->m_v3Ambient));
-
-
-				//Diffuse
-	nUniformLocation = glGetUniformLocation(nProgram, "v3Id");//
-	glUniform3fv(nUniformLocation, 1, glm::value_ptr(pLight->m_v3Diffuse));
-
-
-		//Specular
-	nUniformLocation = glGetUniformLocation(nProgram, "v3Is");//
-	glUniform3fv(nUniformLocation, 1, glm::value_ptr(pLight->m_v3Specular));
-
-
-				//Light Direction
-	pLight->m_v3LightDirection = glm::vec3(-1, 0, 0);
-
-	nUniformLocation = glGetUniformLocation(nProgram, "v3LightDirection");//
-	glUniform3fv(nUniformLocation, 1, glm::value_ptr(pLight->m_v3LightDirection));
+	 nUniformLocation = glGetUniformLocation(pShader->GetShaderProgram(), "v3Ia");
+	glUniform3fv(nUniformLocation, 1, glm::value_ptr(pShader->m_v3Ambient));
 		//Material
 
 
